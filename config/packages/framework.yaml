@@ -1,0 +1,24 @@
+# see https://symfony.com/doc/current/reference/configuration/framework.html
+framework:
+    secret: '%env(APP_SECRET)%'
+
+    # Nur nginx auf localhost wird als vertrauenswürdiger Proxy akzeptiert.
+    trusted_proxies: '127.0.0.1'
+    trusted_headers:
+        - x-forwarded-for
+        - x-forwarded-proto
+        - x-forwarded-port
+
+    session:
+        cookie_secure: auto
+        cookie_samesite: strict
+        cookie_httponly: true
+
+    #esi: true
+    #fragments: true
+
+when@test:
+    framework:
+        test: true
+        session:
+            storage_factory_id: session.storage.factory.mock_file

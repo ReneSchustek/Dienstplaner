@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'search.overview.history'|trans }}{% endblock %}
+{% block page_title %}{{ 'search.overview.history'|trans }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-10">
+        {% include 'search/_nav.html.twig' with {active: 'overview_history'} %}
+
+        <div class="dp-card mb-4">
+            <form method="get" class="row g-2 align-items-end flex-wrap">
+                <div class="col-auto">
+                    <label class="form-label">{{ 'table.from'|trans }}</label>
+                    <input type="date" name="from" value="{{ fromStr }}" class="form-control form-control-sm">
+                </div>
+                <div class="col-auto">
+                    <label class="form-label">{{ 'table.to'|trans }}</label>
+                    <input type="date" name="to" value="{{ toStr }}" class="form-control form-control-sm">
+                </div>
+                <div class="col-auto">
+                    <label class="form-label">{{ 'table.person'|trans }}</label>
+                    <select name="person" class="form-select form-select-sm">
+                        <option value="">– {{ 'search.all'|trans }} –</option>
+                        {% for person in persons %}
+                        <option value="{{ person.id }}"{{ personId == person.id ? ' selected' : '' }}>{{ person.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label class="form-label">{{ 'nav.tasks'|trans }}</label>
+                    <select name="task" class="form-select form-select-sm">
+                        <option value="">– {{ 'search.all'|trans }} –</option>
+                        {% for task in tasks %}
+                        <option value="{{ task.id }}"{{ taskId == task.id ? ' selected' : '' }}>{{ task.department.name }} › {{ task.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label class="form-label">{{ 'table.department'|trans }}</label>
+                    <select name="dept" class="form-select form-select-sm">
+                        <option value="">– {{ 'search.all'|trans }} –</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}"{{ deptId == dept.id ? ' selected' : '' }}>{{ dept.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto align-self-end">
+                    <button type="submit" class="btn btn-sm btn-secondary">{{ 'btn.search'|trans }}</button>
+                    <a href="{{ path('search_overview_history', {from: fromStr, to: toStr, person: personId, task: taskId, dept: deptId, format: 'csv'}) }}" class="btn btn-sm btn-outline-success ms-1">CSV</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="dp-card">
+            {% if assignments is empty %}
+            <p class="text-muted">{{ 'search.no_results'|trans }}</p>
+            {% else %}
+            <p class="text-muted mb-2" style="font-size: 0.85rem;">{{ assignments|length }} {{ 'search.results_count'|trans }}</p>
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>{{ 'table.date'|trans }}</th>
+                        <th>{{ 'table.person'|trans }}</th>
+                        <th>{{ 'table.department'|trans }}</th>
+                        <th>{{ 'nav.tasks'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in assignments %}
+                    <tr>
+                        <td>{{ a.day.date|date('d.m.Y') }}</td>
+                        <td><a href="{{ path('search_person_detail', {id: a.person.id}) }}">{{ a.person.name }}</a></td>
+                        <td>{{ a.task.department.name }}</td>
+                        <td>{{ a.task.name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

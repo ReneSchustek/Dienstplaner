@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="UTF-8"></head>
+<body style="font-family: sans-serif; color: #333; line-height: 1.6;">
+    <p>Hallo {{ user.name ?? user.email }},</p>
+    <p>hier ist dein persönlicher Kalenderlink für <strong>{{ assemblyName }}</strong>:</p>
+    <p>
+        <a href="{{ calendarUrl }}" style="background:#1a56db;color:#fff;padding:10px 20px;border-radius:4px;text-decoration:none;display:inline-block;">
+            Kalender öffnen
+        </a>
+    </p>
+    <p style="color:#666;font-size:0.9em;">
+        Direktlink: <a href="{{ calendarUrl }}">{{ calendarUrl }}</a>
+    </p>
+    <p style="color:#666;font-size:0.9em;">
+        Dieser Link ist persönlich und sollte nicht weitergegeben werden.
+    </p>
+    <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
+    <p style="color:#999;font-size:0.85em;">{{ assemblyName }} – Dienstplaner</p>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'title.assemblies'|trans }}{% endblock %}
+{% block page_title %}{{ 'title.assemblies'|trans }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ 'title.assemblies'|trans }}</h1>
+        <a href="{{ path('assembly_new') }}" class="btn btn-primary">{{ 'btn.new.assembly'|trans }}</a>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{{ 'table.name'|trans }}</th>
+                        <th>{{ 'table.address'|trans }}</th>
+                        <th>{{ 'table.weekdays'|trans }}</th>
+                        <th>{{ 'table.departments'|trans }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set weekdayNames = {0: 'So', 1: 'Mo', 2: 'Di', 3: 'Mi', 4: 'Do', 5: 'Fr', 6: 'Sa'} %}
+                    {% for assembly in assemblies %}
+                    <tr>
+                        <td>{{ assembly.name }}</td>
+                        <td>
+                            {% if assembly.street or assembly.city %}
+                                {% if assembly.street %}{{ assembly.street }},{% endif %}
+                                {% if assembly.zip %} {{ assembly.zip }}{% endif %}
+                                {% if assembly.city %} {{ assembly.city }}{% endif %}
+                            {% else %}–{% endif %}
+                        </td>
+                        <td>
+                            {% for wd in assembly.weekdays %}
+                                <span class="badge bg-light text-dark border">{{ weekdayNames[wd] }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ assembly.departments|length }}</td>
+                        <td class="text-end">
+                            <a href="{{ path('assembly_edit', {id: assembly.id}) }}" class="btn btn-sm btn-outline-primary">{{ 'btn.edit'|trans }}</a>
+                            <form method="post" action="{{ path('assembly_delete', {id: assembly.id}) }}" class="d-inline"
+                                  onsubmit="return confirm('{{ 'confirm.delete'|trans }}')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete-assembly-' ~ assembly.id) }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">{{ 'btn.delete'|trans }}</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-muted text-center">{{ 'msg.no.assemblies'|trans }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

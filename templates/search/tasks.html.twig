@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'search.tasks.title'|trans }}{% endblock %}
+{% block page_title %}{{ 'search.tasks.title'|trans }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-10">
+        {% include 'search/_nav.html.twig' with {active: 'tasks'} %}
+
+        <div class="dp-card mb-4">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-auto flex-grow-1">
+                    <label for="q" class="form-label">{{ 'search.tasks.label'|trans }}</label>
+                    <input type="text" id="q" name="q" value="{{ query }}" class="form-control" placeholder="{{ 'search.tasks.placeholder'|trans }}">
+                </div>
+                <div class="col-auto">
+                    <label for="dept" class="form-label">{{ 'table.department'|trans }}</label>
+                    <select id="dept" name="dept" class="form-select">
+                        <option value="">– {{ 'search.all'|trans }} –</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}"{{ deptId == dept.id ? ' selected' : '' }}>{{ dept.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">{{ 'btn.search'|trans }}</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="dp-card">
+            {% if tasks is empty %}
+            <p class="text-muted">{{ 'search.no_results'|trans }}</p>
+            {% else %}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{{ 'table.department'|trans }}</th>
+                        <th>{{ 'table.name'|trans }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>{{ task.department.name }}</td>
+                        <td>{{ task.name }}</td>
+                        <td><a href="{{ path('search_task_detail', {id: task.id}) }}" class="btn btn-sm btn-outline-secondary">{{ 'btn.details'|trans }}</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

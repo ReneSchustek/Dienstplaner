@@ -1,0 +1,134 @@
+{% extends 'base.html.twig' %}
+{% import '_macros.html.twig' as macros %}
+
+{% block title %}{{ 'title.special_dates'|trans }}{% endblock %}
+{% block page_title %}{{ 'title.special_dates'|trans }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">{{ 'title.special_dates'|trans }}</h1>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newSpecialDateModal">
+            {{ 'btn.new.special_date'|trans }}
+        </button>
+    </div>
+
+    <form method="get" class="mb-3">
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <input type="hidden" name="sort" value="{{ sort }}">
+            <input type="hidden" name="dir" value="{{ dir }}">
+            <input type="text" name="q" class="form-control form-control-sm" style="max-width:280px;"
+                   value="{{ q }}" placeholder="{{ 'filter.search_placeholder'|trans }}">
+            <select name="year" class="form-select form-select-sm" style="max-width:100px;" onchange="this.form.submit()">
+                <option value="0"{{ selectedYear == 0 ? ' selected' : '' }}>{{ 'filter.all_years'|trans }}</option>
+                {% for yr in yearOptions %}
+                    <option value="{{ yr }}"{{ selectedYear == yr ? ' selected' : '' }}>{{ yr }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-outline-secondary">{{ 'btn.search'|trans }}</button>
+            {% if q or selectedYear %}
+                <a href="{{ path('special_date_index', {sort: sort, dir: dir}) }}" class="btn btn-sm btn-outline-secondary">✕</a>
+            {% endif %}
+        </div>
+        {% if q %}<p class="text-muted small mt-1">{{ 'filter.results_for'|trans({'%count%': total, '%q%': q}) }}</p>{% endif %}
+    </form>
+
+    {% if specialDates is empty %}
+        <div class="alert alert-info">{{ 'msg.no.special_dates'|trans }}</div>
+    {% else %}
+    <div class="card">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        {{ macros.sort_th('label.special_date.type'|trans, 'type',      sort, dir, 'special_date_index', {q: q, year: selectedYear}) }}
+                        {{ macros.sort_th('label.start_date'|trans,        'startDate', sort, dir, 'special_date_index', {q: q, year: selectedYear}) }}
+                        {{ macros.sort_th('label.end_date'|trans,          'endDate',   sort, dir, 'special_date_index', {q: q, year: selectedYear}) }}
+                        <th>{{ 'label.note'|trans }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sd in specialDates %}
+                    <tr>
+                        <td>{{ sd.typeEnum.label()|trans }}</td>
+                        <td>{{ sd.startDate|date('d.m.Y') }}</td>
+                        <td>{{ sd.endDate|date('d.m.Y') }}</td>
+                        <td>{{ sd.note ?? '–' }}</td>
+                        <td class="text-end text-nowrap">
+                            <a href="{{ path('special_date_edit', {id: sd.id}) }}" class="btn btn-sm btn-outline-secondary">{{ 'btn.edit'|trans }}</a>
+                            <form method="post" action="{{ path('special_date_delete', {id: sd.id}) }}" style="display:inline" onsubmit="return confirm('{{ 'confirm.delete'|trans }}')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete-special-date-' ~ sd.id) }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">{{ 'btn.delete'|trans }}</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {{ include('_pagination.html.twig') }}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="modal fade" id="newSpecialDateModal" tabindex="-1" aria-labelledby="newSpecialDateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newSpecialDateModalLabel">{{ 'btn.new.special_date'|trans }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'btn.cancel'|trans }}"></button>
+            </div>
+            {{ form_start(newSpecialDateForm) }}
+            <div class="modal-body">
+                <div class="mb-3">
+                    {{ form_label(newSpecialDateForm.type) }}
+                    {{ form_widget(newSpecialDateForm.type) }}
+                    {{ form_errors(newSpecialDateForm.type) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(newSpecialDateForm.startDate) }}
+                    {{ form_widget(newSpecialDateForm.startDate) }}
+                    {{ form_errors(newSpecialDateForm.startDate) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(newSpecialDateForm.endDate) }}
+                    {{ form_widget(newSpecialDateForm.endDate) }}
+                    {{ form_errors(newSpecialDateForm.endDate) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(newSpecialDateForm.note) }}
+                    {{ form_widget(newSpecialDateForm.note) }}
+                    {{ form_errors(newSpecialDateForm.note) }}
+                </div>
+                {{ form_rest(newSpecialDateForm) }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'btn.cancel'|trans }}</button>
+                <button type="submit" class="btn btn-primary">{{ 'btn.save'|trans }}</button>
+            </div>
+            {{ form_end(newSpecialDateForm) }}
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+(function () {
+    var modal = document.getElementById('newSpecialDateModal');
+    if (!modal) return;
+    var from = modal.querySelector('[id$="_startDate"]');
+    var to   = modal.querySelector('[id$="_endDate"]');
+    if (!from || !to) return;
+
+    from.addEventListener('change', function () {
+        if (to.value === '' || to.value === from._prev) {
+            to.value = from.value;
+        }
+        from._prev = from.value;
+    });
+    from._prev = from.value;
+})();
+</script>
+{% endblock %}
+{% endblock %}

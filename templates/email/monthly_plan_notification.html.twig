@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Dienstplan {{ monthName }} {{ year }}</title>
+</head>
+<body style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 24px;">
+    <h2 style="color: #2c3e50;">Dein Dienstplan – {{ monthName }} {{ year }}</h2>
+    <p>Hallo {{ person.name }},</p>
+    <p>hier sind deine Dienste im {{ monthName }} {{ year }} für <strong>{{ assemblyName }}</strong>:</p>
+
+    <table style="border-collapse: collapse; width: 100%; margin-bottom: 20px;">
+        <thead>
+            <tr style="background: #2c3e50; color: #fff;">
+                <th style="padding: 8px 12px; text-align: left;">Datum</th>
+                <th style="padding: 8px 12px; text-align: left;">Aufgabe</th>
+                <th style="padding: 8px 12px; text-align: left;">Abteilung</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for assignment in assignments %}
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 8px 12px;">{{ assignment.day.date|date('d.m.Y') }} ({{ assignment.day.date|date('D') }})</td>
+                <td style="padding: 8px 12px;">{{ assignment.task.name }}</td>
+                <td style="padding: 8px 12px;">{{ assignment.task.department.name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p style="color: #666; font-size: 0.875rem;">
+        Im Anhang findest du eine Kalenderdatei (.ics), die du in deinen Kalender importieren kannst.
+    </p>
+
+    <hr style="border: none; border-top: 1px solid #ddd; margin: 24px 0;">
+    <p style="color: #999; font-size: 0.75rem;">Dienstplaner – {{ assemblyName }}</p>
+</body>
+</html>

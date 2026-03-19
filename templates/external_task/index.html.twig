@@ -1,0 +1,194 @@
+{% extends 'base.html.twig' %}
+{% import '_macros.html.twig' as macros %}
+
+{% block title %}{{ 'title.external_tasks'|trans }}{% endblock %}
+{% block page_title %}{{ 'title.external_tasks'|trans }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h1>{{ 'title.external_tasks'|trans }}</h1>
+        <div class="d-flex gap-2">
+            <a href="{{ path('external_task_import') }}" class="btn btn-outline-secondary">{{ 'import.parse_btn'|trans }}</a>
+            <a href="{{ path('external_task_new') }}" class="btn btn-primary">{{ 'btn.new.external_task'|trans }}</a>
+        </div>
+    </div>
+    <form method="get" class="mb-3">
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <input type="hidden" name="sort" value="{{ sort }}">
+            <input type="hidden" name="dir" value="{{ dir }}">
+            <input type="text" name="q" class="form-control form-control-sm" style="max-width:280px;"
+                   value="{{ q }}" placeholder="{{ 'filter.search_placeholder'|trans }}">
+            <select name="month" class="form-select form-select-sm" style="max-width:130px;" onchange="this.form.submit()">
+                <option value="0"{{ selectedMonth == 0 ? ' selected' : '' }}>{{ 'filter.all_months'|trans }}</option>
+                {% for num, name in monthNames %}
+                    <option value="{{ num }}"{{ selectedMonth == num ? ' selected' : '' }}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            <select name="year" class="form-select form-select-sm" style="max-width:100px;" onchange="this.form.submit()">
+                <option value="0"{{ selectedYear == 0 ? ' selected' : '' }}>{{ 'filter.all_years'|trans }}</option>
+                {% for yr in yearOptions %}
+                    <option value="{{ yr }}"{{ selectedYear == yr ? ' selected' : '' }}>{{ yr }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-outline-secondary">{{ 'btn.search'|trans }}</button>
+            {% if q or selectedMonth or selectedYear %}
+                <a href="{{ path('external_task_index', {sort: sort, dir: dir}) }}" class="btn btn-sm btn-outline-secondary">✕</a>
+            {% endif %}
+        </div>
+        {% if q %}<p class="text-muted small mt-1">{{ 'filter.results_for'|trans({'%count%': total, '%q%': q}) }}</p>{% endif %}
+    </form>
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        {{ macros.sort_th('table.person'|trans, 'person', sort, dir, 'external_task_index', {q: q, month: selectedMonth, year: selectedYear}) }}
+                        {{ macros.sort_th('table.date'|trans,   'date',   sort, dir, 'external_task_index', {q: q, month: selectedMonth, year: selectedYear}) }}
+                        <th>{{ 'label.description'|trans }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for externalTask in externalTasks %}
+                    <tr>
+                        <td>{{ externalTask.person.name }}</td>
+                        <td>{{ externalTask.day.date|date('d.m.Y') }}</td>
+                        <td>{{ externalTask.description ?? '–' }}</td>
+                        <td class="text-end">
+                            <a href="{{ path('external_task_edit', {id: externalTask.id}) }}" class="btn btn-sm btn-outline-primary">{{ 'btn.edit'|trans }}</a>
+                            <form method="post" action="{{ path('external_task_delete', {id: externalTask.id}) }}" class="d-inline"
+                                  onsubmit="return confirm('{{ 'confirm.delete'|trans }}')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete-external-task-' ~ externalTask.id) }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">{{ 'btn.delete'|trans }}</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-muted text-center">{{ 'msg.no.external_tasks'|trans }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {{ include('_pagination.html.twig') }}
+        </div>
+    </div>
+</div>
+
+{# ── Import-Review Modal ─────────────────────────────────────────────────── #}
+{% if pendingImport is not null %}
+<div class="modal fade" id="importReviewModal" tabindex="-1" aria-labelledby="importReviewModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importReviewModalLabel">{{ 'import.review_title'|trans }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+            </div>
+            <form method="post" action="{{ path('external_task_import_confirm') }}" id="import-review-form">
+                <input type="hidden" name="_token" value="{{ csrf_token('external-task-import-confirm') }}">
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">{{ 'import.review_hint'|trans }}</p>
+
+                    {% if pendingImport.items is empty %}
+                        <div class="alert alert-info">{{ 'import.no_events'|trans }}</div>
+                    {% else %}
+                    <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width:40px;"><input type="checkbox" id="import-check-all" checked></th>
+                                <th>{{ 'table.date'|trans }}</th>
+                                <th>{{ 'import.ics_summary'|trans }}</th>
+                                <th>{{ 'label.description'|trans }}</th>
+                                <th>{{ 'table.person'|trans }}</th>
+                                <th>{{ 'import.match_type'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="import-review-body">
+                            {% for i, item in pendingImport.items %}
+                            <tr data-row="{{ i }}">
+                                <td><input type="checkbox" name="selected[]" value="{{ i }}" checked></td>
+                                <td class="text-nowrap">{{ (item.date ?? item.date_start)|date('d.m.Y') }}</td>
+                                <td>{{ item.summary }}</td>
+                                <td>{{ item.description is defined and item.description != item.summary ? item.description : '–' }}</td>
+                                <td>
+                                    <select name="person_id[{{ i }}]" class="form-select form-select-sm" style="min-width:160px;">
+                                        <option value="0">– {{ 'import.no_person'|trans }} –</option>
+                                        {% for person in importPersons %}
+                                        <option value="{{ person.id }}"{{ item.person_id == person.id ? ' selected' : '' }}>{{ person.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td>
+                                    {% if item.match_type == 'exact' %}
+                                        <span class="badge bg-success">{{ 'import.match_exact'|trans }}</span>
+                                    {% elseif item.match_type == 'partial' %}
+                                        <span class="badge bg-warning text-dark">{{ 'import.match_partial'|trans }}</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">{{ 'import.match_none'|trans }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+
+                    {# Pagination-Leiste #}
+                    <div class="d-flex align-items-center gap-3 mt-2">
+                        <button type="button" id="import-prev" class="btn btn-sm btn-outline-secondary">‹</button>
+                        <span id="import-page-info" class="text-muted small"></span>
+                        <button type="button" id="import-next" class="btn btn-sm btn-outline-secondary">›</button>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ 'btn.cancel'|trans }}</button>
+                    <button type="submit" class="btn btn-primary">{{ 'btn.import_confirm'|trans }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+(function () {
+    const PAGE_SIZE = {{ pageSize }};
+    const rows      = Array.from(document.querySelectorAll('#import-review-body tr[data-row]'));
+    const total     = rows.length;
+    const pages     = Math.ceil(total / PAGE_SIZE) || 1;
+    let   current   = 0;
+
+    function showPage(p) {
+        current = Math.max(0, Math.min(p, pages - 1));
+        rows.forEach((row, idx) => {
+            row.style.display = (idx >= current * PAGE_SIZE && idx < (current + 1) * PAGE_SIZE) ? '' : 'none';
+        });
+        document.getElementById('import-page-info').textContent =
+            `${current + 1} / ${pages}  (${total} Einträge)`;
+        document.getElementById('import-prev').disabled = current === 0;
+        document.getElementById('import-next').disabled = current === pages - 1;
+    }
+
+    showPage(0);
+
+    document.getElementById('import-prev')?.addEventListener('click', () => showPage(current - 1));
+    document.getElementById('import-next')?.addEventListener('click', () => showPage(current + 1));
+
+    document.getElementById('import-check-all')?.addEventListener('change', function () {
+        document.querySelectorAll('#import-review-body input[name="selected[]"]')
+            .forEach(cb => cb.checked = this.checked);
+    });
+
+    // Modal automatisch öffnen
+    const modal = new bootstrap.Modal(document.getElementById('importReviewModal'));
+    modal.show();
+})();
+</script>
+{% endblock %}
+{% endif %}
+
+{% endblock %}

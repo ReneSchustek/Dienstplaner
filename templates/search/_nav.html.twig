@@ -1,0 +1,18 @@
+<div class="mb-3">
+    <ul class="nav nav-pills">
+        <li class="nav-item"><a class="nav-link{{ active == 'persons' ? ' active' : '' }}" href="{{ path('search_persons') }}">{{ 'search.tab.persons'|trans }}</a></li>
+        <li class="nav-item"><a class="nav-link{{ active == 'tasks' ? ' active' : '' }}" href="{{ path('search_tasks') }}">{{ 'search.tab.tasks'|trans }}</a></li>
+        <li class="nav-item"><a class="nav-link{{ active == 'availability' ? ' active' : '' }}" href="{{ path('search_availability') }}">{{ 'search.tab.availability'|trans }}</a></li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle{{ active starts with 'overview' ? ' active' : '' }}" data-bs-toggle="dropdown" href="#">{{ 'search.tab.overview'|trans }}</a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ path('search_overview_task_persons') }}">{{ 'search.overview.task_persons'|trans }}</a></li>
+                <li><a class="dropdown-item" href="{{ path('search_overview_person_tasks') }}">{{ 'search.overview.person_tasks'|trans }}</a></li>
+                <li><a class="dropdown-item" href="{{ path('search_overview_history') }}">{{ 'search.overview.history'|trans }}</a></li>
+                <li><a class="dropdown-item" href="{{ path('search_overview_absences') }}">{{ 'search.overview.absences'|trans }}</a></li>
+                <li><a class="dropdown-item" href="{{ path('search_overview_task_stats') }}">{{ 'search.overview.task_stats'|trans }}</a></li>
+            </ul>
+        </li>
+        <li class="nav-item"><a class="nav-link{{ active == 'fairness' ? ' active' : '' }}" href="{{ path('search_fairness') }}">{{ 'search.tab.fairness'|trans }}</a></li>
+    </ul>
+</div>

@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ title }}</h1>
+        <a href="{{ path('assembly_index') }}" class="btn btn-outline-secondary">{{ 'btn.back'|trans }}</a>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            {{ form_start(form) }}
+
+            <ul class="nav nav-tabs mb-4" id="assemblyTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="tab-allgemein" data-bs-toggle="tab"
+                            data-bs-target="#pane-allgemein" type="button" role="tab"
+                            aria-controls="pane-allgemein" aria-selected="true">
+                        Allgemein
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-planung" data-bs-toggle="tab"
+                            data-bs-target="#pane-planung" type="button" role="tab"
+                            aria-controls="pane-planung" aria-selected="false">
+                        Planung
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-sicherheit" data-bs-toggle="tab"
+                            data-bs-target="#pane-sicherheit" type="button" role="tab"
+                            aria-controls="pane-sicherheit" aria-selected="false">
+                        Sicherheit
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-email" data-bs-toggle="tab"
+                            data-bs-target="#pane-email" type="button" role="tab"
+                            aria-controls="pane-email" aria-selected="false">
+                        E-Mail
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-integration" data-bs-toggle="tab"
+                            data-bs-target="#pane-integration" type="button" role="tab"
+                            aria-controls="pane-integration" aria-selected="false">
+                        Integration
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="assemblyTabsContent">
+                {# Allgemein #}
+                <div class="tab-pane fade show active" id="pane-allgemein" role="tabpanel" aria-labelledby="tab-allgemein">
+                    {{ form_row(form.name) }}
+                    {{ form_row(form.street) }}
+                    <div class="row g-2">
+                        <div class="col-3">
+                            {{ form_row(form.zip) }}
+                        </div>
+                        <div class="col-9">
+                            {{ form_row(form.city) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# Planung #}
+                <div class="tab-pane fade" id="pane-planung" role="tabpanel" aria-labelledby="tab-planung">
+                    {{ form_row(form.weekdays) }}
+                    {{ form_row(form.planName) }}
+                    {{ form_row(form.lineColor) }}
+                    {{ form_row(form.footerText) }}
+                    {{ form_row(form.pageSize) }}
+                </div>
+
+                {# Sicherheit #}
+                <div class="tab-pane fade" id="pane-sicherheit" role="tabpanel" aria-labelledby="tab-sicherheit">
+                    {{ form_row(form.twoFactorPolicy) }}
+                </div>
+
+                {# E-Mail #}
+                <div class="tab-pane fade" id="pane-email" role="tabpanel" aria-labelledby="tab-email">
+                    <h6 class="mb-3">Einladungs-E-Mail</h6>
+                    {{ form_row(form.mailInvitationSubject) }}
+                    {{ form_row(form.mailInvitationBody) }}
+
+                    <hr class="my-4">
+                    <h6 class="mb-3">Passwort-Reset-E-Mail</h6>
+                    {{ form_row(form.mailPasswordResetSubject) }}
+                    {{ form_row(form.mailPasswordResetBody) }}
+
+                    <hr class="my-4">
+                    <h6 class="mb-3">Kalenderlink-E-Mail</h6>
+                    {{ form_row(form.mailCalendarLinkSubject) }}
+                    {{ form_row(form.mailCalendarLinkBody) }}
+                </div>
+
+                {# Integration #}
+                <div class="tab-pane fade" id="pane-integration" role="tabpanel" aria-labelledby="tab-integration">
+                    {{ form_row(form.teamupCalendarUrl) }}
+
+                    {% if assembly is defined and assembly.teamupCalendarUrl %}
+                    <div class="mt-3 mb-4">
+                        <h6>TeamUp Import</h6>
+                        <form method="post" action="{{ path('assembly_teamup_import', {id: assembly.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('teamup-import-' ~ assembly.id) }}">
+                            <button type="submit" class="btn btn-outline-info btn-sm">{{ 'btn.teamup.import'|trans }}</button>
+                        </form>
+                    </div>
+                    {% endif %}
+
+                    {% if assembly is defined %}
+                    <hr class="my-3">
+                    <div>
+                        <h6>Öffentliche Kalender-Links</h6>
+                        <p class="text-muted small mb-2">Tokens für öffentlich zugängliche Kalender verwalten.</p>
+                        <a href="{{ path('assembly_token_manage') }}" class="btn btn-outline-secondary btn-sm">
+                            Kalender-Links verwalten
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <hr class="mt-4">
+            <button type="submit" class="btn btn-primary">{{ 'btn.save'|trans }}</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

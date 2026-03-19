@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ assembly.name }} – {{ 'assembly_token.absence.title'|trans }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <style>
+        body { background: #f5f5f5; margin: 0; }
+        .badge-absence { background: #fd7e14; color: #fff; border-radius: 3px; padding: 1px 4px; font-size: 0.75em; display: block; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    </style>
+</head>
+<body>
+
+{{ include('public/_header.html.twig', {appName: assembly.name, subtitle: 'assembly_token.absence.title'|trans}) }}
+
+<div class="container py-4" style="max-width: 960px">
+
+    {% set prevMonth = month == 1 ? 12 : month - 1 %}
+    {% set prevYear  = month == 1 ? year - 1 : year %}
+    {% set nextMonth = month == 12 ? 1 : month + 1 %}
+    {% set nextYear  = month == 12 ? year + 1 : year %}
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <a href="{{ path('assembly_public_absences', {token: token, year: prevYear, month: prevMonth}) }}" class="btn btn-outline-secondary btn-sm">&laquo;</a>
+        <strong>{{ ('month.' ~ month)|trans }} {{ year }}</strong>
+        <a href="{{ path('assembly_public_absences', {token: token, year: nextYear, month: nextMonth}) }}" class="btn btn-outline-secondary btn-sm">&raquo;</a>
+    </div>
+
+    {% if absences is empty %}
+        <div class="alert alert-info">{{ 'assembly_token.no_absences'|trans }}</div>
+    {% else %}
+    <div class="table-responsive">
+        <table class="table table-sm table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>{{ 'label.person'|trans }}</th>
+                    <th>{{ 'label.start_date'|trans }}</th>
+                    <th>{{ 'label.end_date'|trans }}</th>
+                    <th>{{ 'label.note'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for absence in absences %}
+                <tr>
+                    <td>{{ absence.person.name }}</td>
+                    <td>{{ absence.startDate|date('d.m.Y') }}</td>
+                    <td>{{ absence.endDate|date('d.m.Y') }}</td>
+                    <td class="text-muted small">{{ absence.note ?? '' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+</div>
+
+{{ include('public/_footer.html.twig') }}
+</body>
+</html>

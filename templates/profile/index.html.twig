@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'profile.section_title'|trans }}{% endblock %}
+{% block page_title %}{{ 'profile.section_title'|trans }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="max-width: 960px;">
+
+    <div class="row g-4">
+
+        {# Profildaten #}
+        <div class="col-lg-6">
+            <div class="dp-card">
+                <h2 class="card-section-title">{{ 'profile.section_title'|trans }}</h2>
+
+                {% if user.person %}
+                <div class="mb-3">
+                    <label class="form-label text-muted" style="font-size: 0.8rem;">{{ 'label.person.calendar'|trans }}</label>
+                    <div class="form-control-plaintext">{{ user.person.name }}</div>
+                </div>
+                {% endif %}
+
+                <form method="post" action="{{ path('profile_update') }}" novalidate>
+                    <input type="hidden" name="_token" value="{{ csrf_token('profile-update') }}">
+
+                    <div class="mb-3">
+                        <label for="profile_name" class="form-label">{{ 'profile.name'|trans }}</label>
+                        <input
+                            type="text"
+                            id="profile_name"
+                            name="name"
+                            class="form-control"
+                            value="{{ user.name ?? '' }}"
+                            autocomplete="name"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="profile_email" class="form-label">{{ 'profile.email'|trans }}</label>
+                        <input
+                            type="email"
+                            id="profile_email"
+                            name="email"
+                            class="form-control"
+                            value="{{ user.email }}"
+                            autocomplete="email"
+                            required
+                            aria-required="true"
+                        >
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">{{ 'btn.save'|trans }}</button>
+                </form>
+            </div>
+        </div>
+
+        {# Passwort ändern #}
+        <div class="col-lg-6">
+            <div class="dp-card">
+                <h2 class="card-section-title">{{ 'profile.password_section'|trans }}</h2>
+
+                <form method="post" action="{{ path('profile_change_password') }}" novalidate>
+                    <input type="hidden" name="_token" value="{{ csrf_token('profile-change-password') }}">
+
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">{{ 'profile.current_password'|trans }}</label>
+                        <input
+                            type="password"
+                            id="current_password"
+                            name="current_password"
+                            class="form-control"
+                            autocomplete="current-password"
+                            required
+                            aria-required="true"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">{{ 'label.new_password'|trans }}</label>
+                        <input
+                            type="password"
+                            id="new_password"
+                            name="new_password"
+                            class="form-control"
+                            autocomplete="new-password"
+                            required
+                            aria-required="true"
+                            minlength="8"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">{{ 'label.password_confirm'|trans }}</label>
+                        <input
+                            type="password"
+                            id="confirm_password"
+                            name="confirm_password"
+                            class="form-control"
+                            autocomplete="new-password"
+                            required
+                            aria-required="true"
+                        >
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">{{ 'btn.save'|trans }}</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="mt-3 d-flex gap-2 flex-wrap">
+        {% if user.assembly is null or user.assembly.twoFactorPolicy != 'disabled' %}
+        <a href="{{ path('profile_2fa') }}" class="btn btn-outline-secondary btn-sm">
+            {{ 'nav.2fa'|trans }} →
+        </a>
+        {% endif %}
+        <a href="{{ path('profile_2fa') }}#calendar-token" class="btn btn-outline-secondary btn-sm">
+            {{ 'calendar_token.section_title'|trans }} →
+        </a>
+    </div>
+
+    {# Gefahrenzone #}
+    <div class="mt-4 dp-card" style="border: 2px solid var(--color-danger, #dc3545);">
+        <h2 class="card-section-title" style="color: var(--color-danger, #dc3545);">
+            {{ 'profile.danger_zone'|trans }}
+        </h2>
+        <p class="text-muted" style="font-size: 0.875rem; margin-bottom: 16px;">
+            {{ 'profile.delete_account_hint'|trans }}
+        </p>
+        <form method="post" action="{{ path('profile_delete_account') }}"
+              onsubmit="return confirm('{{ 'profile.delete_account_confirm'|trans|e('js') }}')">
+            <input type="hidden" name="_token" value="{{ csrf_token('profile-delete-account') }}">
+            <button type="submit" class="btn btn-danger btn-sm">
+                {{ 'profile.delete_account'|trans }}
+            </button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

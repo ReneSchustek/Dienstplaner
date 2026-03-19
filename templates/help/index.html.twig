@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hilfe{% endblock %}
+{% block page_title %}Hilfe{% endblock %}
+
+{% block stylesheets %}
+<style>
+.help-section {
+    background: var(--color-card-bg, #fff);
+    border: 1px solid var(--color-border, #ddd);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    scroll-margin-top: 80px;
+}
+.help-section h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--color-accent, #1a56db);
+    color: var(--color-accent, #1a56db);
+}
+.help-section ul {
+    padding-left: 18px;
+    margin: 0;
+    line-height: 1.9;
+}
+.help-nav {
+    position: sticky;
+    top: 16px;
+}
+.help-nav a {
+    display: block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary, #555);
+    text-decoration: none;
+}
+.help-nav a:hover {
+    background: var(--color-hover, #f0f4ff);
+    color: var(--color-accent, #1a56db);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row g-4">
+        <div class="col-lg-2 d-none d-lg-block">
+            <nav class="help-nav">
+                <div class="fw-semibold mb-2" style="font-size:0.8rem; text-transform:uppercase; letter-spacing:.05em; color: var(--color-text-secondary);">Inhalt</div>
+                <a href="#dashboard">{{ 'help.nav.dashboard'|trans }}</a>
+                {% if is_granted('ROLE_PLANER') %}<a href="#planung">{{ 'help.nav.planning'|trans }}</a>{% endif %}
+                <a href="#kalender">{{ 'help.nav.calendar'|trans }}</a>
+                {% if is_granted('ROLE_PLANER') %}<a href="#abwesenheiten">{{ 'help.nav.absences'|trans }}</a>{% endif %}
+                {% if is_granted('ROLE_PLANER') %}<a href="#besondere-daten">{{ 'help.nav.special_dates'|trans }}</a>{% endif %}
+                {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#andere-aufgaben">{{ 'help.nav.other_tasks'|trans }}</a>{% endif %}
+                {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#personen">{{ 'help.nav.persons'|trans }}</a>{% endif %}
+                {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#abteilungen">{{ 'help.nav.departments'|trans }}</a>{% endif %}
+                {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#aufgaben">{{ 'help.nav.tasks'|trans }}</a>{% endif %}
+                {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#suche">{{ 'help.nav.search'|trans }}</a>{% endif %}
+                {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#export">{{ 'help.nav.export'|trans }}</a>{% endif %}
+                {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#benutzerverwaltung">{{ 'help.nav.users'|trans }}</a>{% endif %}
+                <a href="#profil">{{ 'help.nav.profile'|trans }}</a>
+            </nav>
+        </div>
+        <div class="col-lg-10">
+            {{ include('help/_sections.html.twig') }}
+        </div>
+    </div>
+</div>
+{% endblock %}

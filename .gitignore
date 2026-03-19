@@ -1,0 +1,38 @@
+### Symfony ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+
+### Node ###
+/node_modules/
+
+### IDE ###
+/.idea/
+/.vscode/
+*.iml
+
+### DDEV ###
+/.ddev/
+
+### AI Development ###
+/ai/
+/briefs/
+/docs/
+/memory/
+/.claude/
+/CLAUDE.md
+/STATUS.md
+
+### Local only ###
+/zugaenge.md
+/TODO.md
+/git
+/.env.live
+/public/extract.php
+/public/info.php
+/public/.htaccess
+/DEPLOYMENT.md

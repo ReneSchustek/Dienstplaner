@@ -1,0 +1,160 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ title }}</h1>
+        <a href="{{ path('person_index') }}" class="btn btn-outline-secondary">{{ 'btn.back'|trans }}</a>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    {{ form_widget(form) }}
+                    <button type="submit" class="btn btn-primary mt-3">{{ 'btn.save'|trans }}</button>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        {% if person is defined and linkedUser is defined %}
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-header fw-semibold">{{ 'calendar_token.section_title'|trans }}</div>
+                <div class="card-body">
+                    {% if linkedUser is null %}
+                        <p class="text-muted small mb-3">{{ 'user.no_linked_account'|trans }}</p>
+                        <button type="button" class="btn btn-primary btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#createUserModal">
+                            {{ 'btn.create_user'|trans }}
+                        </button>
+                    {% elseif linkedUser.calendarToken %}
+                        <p class="small text-muted mb-2">{{ 'calendar_token.description'|trans }}</p>
+                        <div class="input-group input-group-sm mb-3">
+                            <input type="text" id="person-calendar-url" class="form-control form-control-sm"
+                                   value="{{ url('calendar_token_view', {token: linkedUser.calendarToken}) }}" readonly>
+                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="copyPersonCalendarLink(this)">
+                                {{ 'calendar_token.btn_copy'|trans }}
+                            </button>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <form method="post" action="{{ path('person_calendar_token_send', {id: person.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('person-calendar-token-send-' ~ person.id) }}">
+                                <button type="submit" class="btn btn-outline-primary btn-sm">{{ 'btn.send_calendar_link'|trans }}</button>
+                            </form>
+                            <form method="post" action="{{ path('person_calendar_token_generate', {id: person.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('person-calendar-token-' ~ person.id) }}">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">{{ 'calendar_token.btn_reset'|trans }}</button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-2">{{ 'calendar_token.no_token'|trans }}</p>
+                        <form method="post" action="{{ path('person_calendar_token_generate', {id: person.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('person-calendar-token-' ~ person.id) }}">
+                            <button type="submit" class="btn btn-primary btn-sm">{{ 'calendar_token.btn_generate'|trans }}</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if person is defined and linkedUser is defined and linkedUser is null %}
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createUserModalLabel">Benutzerkonto erstellen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+            </div>
+            <form method="post" action="{{ path('person_create_user', {id: person.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('person-create-user-' ~ person.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" for="modal-name">{{ 'label.name'|trans }}</label>
+                        <input type="text" id="modal-name" class="form-control" value="{{ person.name }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="modal-email">{{ 'label.email'|trans }}</label>
+                        <input type="email" id="modal-email" name="email" class="form-control"
+                               value="{{ person.email ?? '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="modal-password">{{ 'label.password'|trans }}</label>
+                        <div class="input-group">
+                            <input type="text" id="modal-password" name="plainPassword" class="form-control"
+                                   required minlength="8" autocomplete="off">
+                            <button type="button" class="btn btn-outline-secondary" onclick="generateModalPassword()">{{ 'btn.generate'|trans }}</button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="modal-role">{{ 'label.role'|trans }}</label>
+                        <select id="modal-role" name="role" class="form-select">
+                            <option value="ROLE_USER">{{ 'role.user'|trans }}</option>
+                            <option value="ROLE_PLANER">{{ 'role.planer'|trans }}</option>
+                            <option value="ROLE_ASSEMBLY_ADMIN">{{ 'role.assembly_admin'|trans }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" id="modal-notify" name="notify" value="1" class="form-check-input" checked>
+                        <label class="form-check-label" for="modal-notify">Einladungs-E-Mail senden</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'btn.cancel'|trans }}</button>
+                    <button type="submit" class="btn btn-primary">Konto erstellen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if person is defined and linkedUser is defined and linkedUser is null %}
+<script>
+function generateModalPassword() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%&';
+    const arr = new Uint8Array(12);
+    crypto.getRandomValues(arr);
+    let pwd = '';
+    for (let i = 0; i < 12; i++) {
+        pwd += chars[arr[i] % chars.length];
+    }
+    document.getElementById('modal-password').value = pwd;
+}
+document.addEventListener('DOMContentLoaded', function () {
+    generateModalPassword();
+});
+</script>
+{% endif %}
+
+{% if person is defined and linkedUser is defined and linkedUser is not null and linkedUser.calendarToken %}
+<script>
+function copyPersonCalendarLink(btn) {
+    const input = document.getElementById('person-calendar-url');
+    const original = btn.textContent;
+    const onCopied = () => {
+        btn.textContent = '✓';
+        btn.classList.replace('btn-outline-secondary', 'btn-success');
+        setTimeout(() => {
+            btn.textContent = original;
+            btn.classList.replace('btn-success', 'btn-outline-secondary');
+        }, 2000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(input.value).then(onCopied).catch(() => {
+            input.select(); document.execCommand('copy'); onCopied();
+        });
+    } else {
+        input.select(); document.execCommand('copy'); onCopied();
+    }
+}
+</script>
+{% endif %}
+{% endblock %}

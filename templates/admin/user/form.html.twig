@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ title }}</h1>
+        <a href="{{ path('admin_user_index') }}" class="btn btn-outline-secondary">{{ 'btn.back'|trans }}</a>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            {{ form_start(form) }}
+
+            <div class="mb-3">
+                {{ form_label(form.name) }}
+                {{ form_widget(form.name) }}
+                {{ form_errors(form.name) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.email) }}
+                {{ form_widget(form.email) }}
+                {{ form_errors(form.email) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.role) }}
+                {{ form_widget(form.role, {attr: {id: 'user_role'}}) }}
+                {{ form_errors(form.role) }}
+            </div>
+
+            <div class="mb-3 field-assembly" id="field-assembly">
+                {{ form_label(form.assembly) }}
+                {{ form_widget(form.assembly) }}
+                {{ form_errors(form.assembly) }}
+            </div>
+
+            <div class="mb-3 field-department" id="field-department">
+                {{ form_label(form.departments) }}
+                {{ form_widget(form.departments) }}
+                {{ form_errors(form.departments) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.twoFactorRequired) }}
+                {{ form_widget(form.twoFactorRequired) }}
+                {{ form_errors(form.twoFactorRequired) }}
+            </div>
+
+            {% if form.plainPassword is defined %}
+            <div class="mb-3">
+                {{ form_label(form.plainPassword) }}
+                {{ form_widget(form.plainPassword) }}
+                {{ form_errors(form.plainPassword) }}
+            </div>
+            {% endif %}
+
+            {{ form_rest(form) }}
+
+            <button type="submit" class="btn btn-primary mt-3">{{ 'btn.save'|trans }}</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    {% if user is not null %}
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ 'btn.reset_password'|trans }}</h5>
+            <p class="text-muted small">{{ 'user.reset_password_hint'|trans }}</p>
+            <form method="post" action="{{ path('admin_user_reset_password', {id: user.id}) }}"
+                  onsubmit="return confirm('{{ 'user.reset_password_confirm'|trans }}')">
+                <input type="hidden" name="_token" value="{{ csrf_token('reset-password-' ~ user.id) }}">
+                <button type="submit" class="btn btn-outline-warning">{{ 'btn.reset_password'|trans }}</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% block javascripts %}
+<script>
+(function () {
+    var roleSelect = document.getElementById('user_role');
+    if (!roleSelect) return;
+
+    var fieldAssembly   = document.getElementById('field-assembly');
+    var fieldDepartment = document.getElementById('field-department');
+
+    function updateFields() {
+        var role = roleSelect.value;
+        // Assembly: sichtbar für Versammlungsadmin und Admin
+        var showAssembly = (role === 'ROLE_ASSEMBLY_ADMIN' || role === 'ROLE_ADMIN');
+        // Department: sichtbar nur für Planer
+        var showDept = (role === 'ROLE_PLANER');
+
+        if (fieldAssembly) fieldAssembly.style.display = showAssembly ? '' : 'none';
+        if (fieldDepartment) fieldDepartment.style.display = showDept ? '' : 'none';
+    }
+
+    roleSelect.addEventListener('change', updateFields);
+    updateFields();
+})();
+</script>
+{% endblock %}
+{% endblock %}

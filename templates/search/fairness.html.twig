@@ -1,0 +1,105 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'search.fairness.title'|trans }}{% endblock %}
+{% block page_title %}{{ 'search.fairness.title'|trans }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+.fairness-table th, .fairness-table td {
+    white-space: nowrap;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    text-align: center;
+}
+.fairness-table th:first-child, .fairness-table td:first-child {
+    text-align: left;
+    min-width: 140px;
+}
+.cell-over  { background: #fee2e2; color: #991b1b; font-weight: 600; }
+.cell-under { background: #fef9c3; color: #92400e; }
+.cell-neutral { background: #dcfce7; color: #166534; }
+.cell-zero  { color: #aaa; }
+.avg-row td { background: #f3f4f6; font-style: italic; font-size: 0.78rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    {{ include('search/_nav.html.twig', {active: 'fairness'}) }}
+
+    <form method="get" class="row g-2 mb-4 align-items-end">
+        <div class="col-auto">
+            <label class="form-label mb-1">{{ 'label.year'|trans }}</label>
+            <select name="year" class="form-select form-select-sm">
+                {% for y in range('now'|date('Y') - 2, 'now'|date('Y')) %}
+                    <option value="{{ y }}"{{ y == year ? ' selected' : '' }}>{{ y }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label mb-1">{{ 'label.month'|trans }} ({{ 'search.optional'|trans }})</label>
+            <select name="month" class="form-select form-select-sm">
+                <option value="">{{ 'search.all'|trans }}</option>
+                {% for m in 1..12 %}
+                    <option value="{{ m }}"{{ m == month ? ' selected' : '' }}>{{ ('month.' ~ m)|trans }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary btn-sm">{{ 'btn.search'|trans }}</button>
+        </div>
+        {% if rows|length > 0 %}
+        <div class="col-auto ms-auto">
+            <a href="{{ path('search_fairness', {year: year, month: month, format: 'csv'}) }}" class="btn btn-outline-secondary btn-sm">CSV</a>
+        </div>
+        {% endif %}
+    </form>
+
+    {% if rows|length == 0 %}
+        <p class="text-muted">{{ 'search.no_results'|trans }}</p>
+    {% else %}
+    <div class="table-responsive">
+        <table class="table table-bordered fairness-table">
+            <thead class="table-light">
+                <tr>
+                    <th>{{ 'search.fairness.person'|trans }}</th>
+                    {% for task in tasks %}
+                        <th title="{{ task.getDepartment().getName() }}">{{ task.getName() }}</th>
+                    {% endfor %}
+                    <th>{{ 'search.fairness.total'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ row.person.getName() }}</td>
+                    {% for task in tasks %}
+                        {% set cell = row.cells[task.getId()] %}
+                        <td class="cell-{{ cell.count == 0 ? 'zero' : cell.class }}">
+                            {{ cell.count > 0 ? cell.count : '–' }}
+                        </td>
+                    {% endfor %}
+                    <td><strong>{{ row.total }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="avg-row">
+                    <td>{{ 'search.fairness.avg'|trans }}</td>
+                    {% for task in tasks %}
+                        <td>{{ avgs[task.getId()]|number_format(1, ',') }}</td>
+                    {% endfor %}
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="d-flex gap-3 mt-2" style="font-size:0.8rem;">
+        <span class="badge cell-over px-2 py-1">▲ {{ 'search.fairness.over'|trans }}</span>
+        <span class="badge cell-under px-2 py-1">▼ {{ 'search.fairness.under'|trans }}</span>
+        <span class="badge cell-neutral px-2 py-1">✓ {{ 'search.fairness.ok'|trans }}</span>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

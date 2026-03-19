@@ -1,0 +1,26 @@
+{#
+ # Sortierbare Tabellenspalte mit Link-Header.
+ #
+ # @param label       Anzeigetext
+ # @param field       Sortierfeld (z. B. 'startDate', 'person')
+ # @param sort        Aktuell aktives Sortierfeld
+ # @param dir         Aktuelle Sortierrichtung ('ASC'|'DESC')
+ # @param route       Routenname für den Link
+ # @param params      Zusätzliche URL-Parameter (wird mit sort/dir/page gemerged)
+ # @param class       Optionale CSS-Klasse für <th>
+ #}
+{% macro sort_th(label, field, sort, dir, route, params, class='') %}
+    {% set newDir = (sort == field and dir == 'ASC') ? 'DESC' : 'ASC' %}
+    <th class="{{ class }}">
+        <a href="{{ path(route, params|merge({sort: field, dir: newDir, page: 1})) }}"
+           class="d-flex align-items-center gap-1 text-decoration-none"
+           style="color: inherit; white-space: nowrap;">
+            {{ label }}
+            {% if sort == field %}
+                <span aria-hidden="true" class="text-muted" style="font-size:.75em;">{{ dir == 'ASC' ? '▲' : '▼' }}</span>
+            {% else %}
+                <span aria-hidden="true" class="text-muted" style="font-size:.75em; opacity:.4;">⬍</span>
+            {% endif %}
+        </a>
+    </th>
+{% endmacro %}

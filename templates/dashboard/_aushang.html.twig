@@ -1,0 +1,89 @@
+{# Partial: Dienstplan-Aushang (read-only) #}
+{# Requires: grid, departmentBlocks, year, month, prevYear, prevMonth, nextYear, nextMonth #}
+
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+    <h2 style="font-size: 1rem; font-weight: 600; margin: 0;">
+        {{ 'dashboard.current_plan'|trans }} – {{ ('month.' ~ month)|trans }} {{ year }}
+    </h2>
+    <div class="d-flex gap-2">
+        <a href="{{ path('dashboard', {year: prevYear, month: prevMonth}) }}"
+           class="btn btn-outline-secondary btn-sm">
+            &lsaquo; {{ ('month.' ~ prevMonth)|trans }}
+        </a>
+        <a href="{{ path('dashboard', {year: nextYear, month: nextMonth}) }}"
+           class="btn btn-outline-secondary btn-sm">
+            {{ ('month.' ~ nextMonth)|trans }} &rsaquo;
+        </a>
+    </div>
+</div>
+
+{% if grid is empty %}
+    <p class="text-muted mb-0">{{ 'planning.no_days'|trans }}</p>
+{% else %}
+
+{% for block in departmentBlocks %}
+{% set deptColor = block.dept.color|default('#1a56db') %}
+{# Luminanz-Berechnung: R*0.299 + G*0.587 + B*0.114 #}
+{% set r = ('0x' ~ deptColor[1:3])|number_format(0) %}
+{% set g = ('0x' ~ deptColor[3:5])|number_format(0) %}
+{% set b = ('0x' ~ deptColor[5:7])|number_format(0) %}
+{# Näherung: helle Farbe wenn alle Kanäle im oberen Bereich #}
+{% set textColor = '#ffffff' %}
+<div class="card mb-3" style="overflow: hidden;">
+    <div class="card-header fw-semibold" style="background-color: {{ deptColor }}; color: {{ textColor }}; border-bottom: none;">
+        {{ block.dept.name }}
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>{{ 'table.date'|trans }}</th>
+                        {% for task in block.tasks %}
+                        <th class="text-center small">{{ task.name }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dayId, row in grid %}
+                    {% set day = row.day %}
+                    {% set dayAssignments = row.assignments %}
+                    {% if not row.isBlocked %}
+                    <tr>
+                        <td class="fw-semibold text-nowrap" style="font-size: 0.8rem;">
+                            {{ day.date|date('d.m.') }} ({{ ('day.' ~ day.date|date('D'))|trans }})
+                        </td>
+                        {% for task in block.tasks %}
+                        {% set assignment = dayAssignments[task.id] is defined ? dayAssignments[task.id] : null %}
+                        <td class="text-center" style="font-size: 0.8rem;">
+                            {% if assignment %}
+                                <span class="badge bg-success">{{ assignment.person.name }}</span>
+                            {% else %}
+                                <span class="text-muted">–</span>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td class="fw-semibold text-nowrap" style="font-size: 0.8rem;">
+                            {{ day.date|date('d.m.') }} ({{ ('day.' ~ day.date|date('D'))|trans }})
+                        </td>
+                        <td colspan="{{ block.tasks|length }}" class="text-center text-muted" style="font-size: 0.8rem;">
+                            {% if row.specialLabel %}
+                                <span class="badge bg-warning text-dark">{{ row.specialLabel|trans }}</span>
+                            {% else %}
+                                –
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endif %}

@@ -1,0 +1,758 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'title.planning'|trans }}{% endblock %}
+{% block page_title %}{{ 'title.planning'|trans }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    {% set prevMonth = month == 1 ? 12 : month - 1 %}
+    {% set prevYear = month == 1 ? year - 1 : year %}
+    {% set nextMonth = month == 12 ? 1 : month + 1 %}
+    {% set nextYear = month == 12 ? year + 1 : year %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 no-print">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ path('planning_index', {year: prevYear, month: prevMonth}) }}"
+               class="btn btn-outline-secondary" aria-label="Vorheriger Monat">&laquo;</a>
+            <h1 class="mb-0 fs-5">{{ assembly.name }} – {{ ('month.' ~ month)|trans }} {{ year }}</h1>
+            <a href="{{ path('planning_index', {year: nextYear, month: nextMonth}) }}"
+               class="btn btn-outline-secondary" aria-label="Nächster Monat">&raquo;</a>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            {% if is_granted('ROLE_PLANER') %}
+            <button type="button" class="btn btn-sm btn-primary" id="btn-save-all">{{ 'btn.save_all'|trans }}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-reset-all"
+                    title="{{ 'btn.reset_hint'|trans }}">{{ 'btn.reset'|trans }}</button>
+            {% endif %}
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">{{ 'btn.print'|trans }}</button>
+            {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}
+            <button type="button" class="btn btn-sm btn-outline-primary" id="btn-suggest"
+                    data-suggest-url="{{ path('planning_suggest', {year: year, month: month}) }}">
+                {{ 'planning.suggest_btn'|trans }}
+            </button>
+            {% endif %}
+            {{ include('planning/_notify_form.html.twig') }}
+        </div>
+    </div>
+
+    <div class="print-only mb-3">
+        <h2>{{ assembly.name }} – {{ ('month.' ~ month)|trans }} {{ year }}</h2>
+    </div>
+
+    {# === Bestätigungs-Modal === #}
+    {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}
+    <div class="modal fade" id="suggestModal" tabindex="-1" aria-labelledby="suggestModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="suggestModalLabel">{{ 'planning.suggest_modal.title'|trans }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'btn.cancel'|trans }}"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">{{ 'planning.suggest_modal.hint'|trans }}</p>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input suggest-check" type="checkbox" id="check1">
+                        <label class="form-check-label" for="check1">{{ 'planning.suggest_modal.check1'|trans }}</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input suggest-check" type="checkbox" id="check2">
+                        <label class="form-check-label" for="check2">{{ 'planning.suggest_modal.check2'|trans }}</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input suggest-check" type="checkbox" id="check3">
+                        <label class="form-check-label" for="check3">{{ 'planning.suggest_modal.check3'|trans }}</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'btn.cancel'|trans }}</button>
+                    <button type="button" class="btn btn-primary" id="btn-suggest-confirm" disabled>
+                        {{ 'planning.suggest_modal.confirm'|trans }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# === Vorschlag-Hinweis (erscheint nach Generierung) === #}
+    <div id="proposal-notice" class="d-none alert alert-info alert-dismissible mb-3 py-2" role="status">
+        <span id="proposal-notice-text"></span>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="{{ 'btn.cancel'|trans }}"></button>
+    </div>
+    {% endif %}
+
+    {# === Force-Assign Modal === #}
+    {% if is_granted('ROLE_PLANER') %}
+    <div class="modal fade" id="forceAssignModal" tabindex="-1" aria-labelledby="forceAssignModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forceAssignModalLabel">{{ 'planning.force_modal.title'|trans }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'btn.cancel'|trans }}"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0 small" id="force-assign-message"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">{{ 'btn.cancel'|trans }}</button>
+                    <button type="button" class="btn btn-warning btn-sm" id="btn-force-confirm">{{ 'planning.force_modal.confirm'|trans }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# === Toast Feedback === #}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3 no-print" style="z-index: 1100;">
+        <div id="planning-toast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2500">
+            <div class="d-flex">
+                <div class="toast-body" id="planning-toast-body"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="{{ 'btn.cancel'|trans }}"></button>
+            </div>
+        </div>
+    </div>
+
+    {% if grid is empty %}
+        <div class="alert alert-info">{{ 'planning.no_days'|trans }}</div>
+    {% else %}
+
+    {% for block in departmentBlocks %}
+    {% set deptColor = block.dept.color|default('#1a56db') %}
+    {% set deptTextColor = deptColor|contrast_color %}
+    <div class="card mb-4" data-dept-id="{{ block.dept.id }}">
+        <div class="card-header fw-semibold" style="background-color: {{ deptColor }}; color: {{ deptTextColor }}; border-bottom: none;">
+            {{ block.dept.name }}
+        </div>
+        {% if is_granted('ROLE_PLANER') %}
+        <div id="lock-banner-{{ block.dept.id }}" class="d-none alert alert-warning mb-0 py-2 px-3 border-0 border-bottom rounded-0 small no-print" role="alert">
+            <span id="lock-banner-text-{{ block.dept.id }}"></span>
+        </div>
+        {% endif %}
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm mb-0 planning-grid" aria-label="{{ block.dept.name }}">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="align-middle fw-semibold" style="background-color: {{ deptColor }}; color: {{ deptTextColor }}; border-color: rgba(0,0,0,0.15);">{{ 'table.date'|trans }}</th>
+                            {% for task in block.tasks %}
+                            <th scope="col" class="align-middle text-center small fw-semibold" style="background-color: {{ deptColor }}; color: {{ deptTextColor }}; border-color: rgba(0,0,0,0.15);">{{ task.name }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dayId, row in grid %}
+                        {% set day = row.day %}
+                        {% set dayAssignments = row.assignments %}
+                        {# Status-Icon pro Tag: Zähle vergebene Aufgaben für diesen Tag in diesem Abteilungsblock #}
+                        {% set dayAssigned = 0 %}
+                        {% set dayTotal = block.tasks|length %}
+                        {% if not row.isBlocked %}
+                            {% for task in block.tasks %}
+                                {% if dayAssignments[task.id] is defined %}
+                                    {% set dayAssigned = dayAssigned + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        {% if not row.isBlocked and dayTotal > 0 %}
+                            {% if dayAssigned == 0 %}
+                                {% set statusIcon %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" style="vertical-align:middle;">
+                                    <rect width="14" height="14" rx="2" fill="#dc3545"/>
+                                    <text x="7" y="11" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">!</text>
+                                </svg>
+                                {% endset %}
+                                {% set statusTitle = '0 von ' ~ dayTotal ~ ' Aufgaben vergeben' %}
+                            {% elseif dayAssigned < dayTotal %}
+                                {% set statusIcon %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" style="vertical-align:middle;">
+                                    <rect width="14" height="14" rx="2" fill="#ffc107"/>
+                                    <text x="7" y="11" text-anchor="middle" font-size="10" font-weight="bold" fill="#000">!</text>
+                                </svg>
+                                {% endset %}
+                                {% set statusTitle = dayAssigned ~ ' von ' ~ dayTotal ~ ' Aufgaben vergeben' %}
+                            {% else %}
+                                {% set statusIcon %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" style="vertical-align:middle;">
+                                    <rect width="14" height="14" rx="2" fill="#198754"/>
+                                    <polyline points="3,7 6,10 11,4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                {% endset %}
+                                {% set statusTitle = 'Alle ' ~ dayTotal ~ ' Aufgaben vergeben' %}
+                            {% endif %}
+                        {% else %}
+                            {% set statusIcon = '' %}
+                            {% set statusTitle = '' %}
+                        {% endif %}
+                        <tr>
+                            <td class="fw-semibold text-nowrap">
+                                <span class="day-status-icon me-1"
+                                      data-day-id="{{ day.id }}"
+                                      data-block="{{ block.dept.id }}"
+                                      title="{{ statusTitle }}">{{ statusIcon }}</span>
+                                {{ day.date|date('d.m.') }} ({{ ('day.' ~ day.date|date('D'))|trans }})
+                                {% if row.specialLabel and not row.isBlocked %}
+                                    <span class="badge bg-warning text-dark ms-1">{{ row.specialLabel|trans }}</span>
+                                {% endif %}
+                            </td>
+                            {% if row.isBlocked %}
+                            <td colspan="{{ block.tasks|length }}" class="text-center p-2">
+                                {% if row.specialLabel %}
+                                <span class="badge bg-warning text-dark px-3 py-2">{{ row.specialLabel|trans }}</span>
+                                {% endif %}
+                            </td>
+                            {% else %}
+                            {% for task in block.tasks %}
+                            {% set assignment = dayAssignments[task.id] is defined ? dayAssignments[task.id] : null %}
+                            <td class="p-1 text-center">
+                                {% if is_granted('ROLE_PLANER') %}
+                                <select class="form-select form-select-sm assignment-select"
+                                        data-day-id="{{ day.id }}"
+                                        data-task-id="{{ task.id }}"
+                                        data-block="{{ block.dept.id }}"
+                                        aria-label="{{ task.name }} – {{ day.date|date('d.m.Y') }}">
+                                    <option value="0">{{ 'planning.free'|trans }}</option>
+                                    {% for person in personsByTask[task.id]|default([]) %}
+                                    <option value="{{ person.id }}"
+                                        data-person-id="{{ person.id }}"
+                                        {% if assignment and assignment.person.id == person.id %}selected{% endif %}>
+                                        {{ person.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <span class="assignment-label">{% if assignment %}{{ assignment.person.name }}{% endif %}</span>
+                                {% else %}
+                                    {% if assignment %}
+                                        <span class="badge bg-success">{{ assignment.person.name }}</span>
+                                    {% else %}
+                                        <span class="text-muted">–</span>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% if is_granted('ROLE_PLANER') %}
+    <div class="text-end mb-2 no-print d-flex gap-2 justify-content-end">
+        <button type="button" class="btn btn-sm btn-outline-secondary btn-reset-block"
+                data-block="{{ block.dept.id }}"
+                title="{{ 'btn.reset_hint'|trans }}">{{ 'btn.reset'|trans }}</button>
+        <button type="button" class="btn btn-sm btn-primary btn-save-block"
+                data-block="{{ block.dept.id }}">{{ 'btn.save'|trans }}</button>
+    </div>
+    {% endif %}
+    {% endfor %}
+
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{% if is_granted('ROLE_PLANER') %}
+<script>
+(function () {
+    /**
+     * Baut eine Map: dayId -> Set<personId>
+     * für alle Selects außer dem aktuellen (excludeSelect).
+     * Ermöglicht blockübergreifenden Ausschluss pro Tag.
+     */
+    function buildDayPersonMap(excludeSelect) {
+        var map = {};
+        document.querySelectorAll('.assignment-select').forEach(function (sel) {
+            if (sel === excludeSelect) return;
+            var dayId = sel.dataset.dayId;
+            var val = sel.value;
+            if (val !== '0') {
+                if (!map[dayId]) map[dayId] = new Set();
+                map[dayId].add(val);
+            }
+        });
+        return map;
+    }
+
+    /** Aktualisiert alle Selects anhand der tagesaktuellen Belegung. */
+    function refreshAllSelects() {
+        var dayPersonMap = buildDayPersonMap(null);
+        document.querySelectorAll('.assignment-select').forEach(function (sel) {
+            var dayId = sel.dataset.dayId;
+            var taken = dayPersonMap[dayId] || new Set();
+            var currentVal = sel.value;
+            sel.querySelectorAll('option[data-person-id]').forEach(function (opt) {
+                var pid = opt.dataset.personId;
+                opt.disabled = taken.has(pid) && pid !== currentVal;
+            });
+        });
+    }
+
+    /** Shows a brief success toast. */
+    function showToast(msg) {
+        var toastEl = document.getElementById('planning-toast');
+        var toastBody = document.getElementById('planning-toast-body');
+        if (!toastEl || !toastBody) return;
+        toastBody.textContent = msg;
+        bootstrap.Toast.getOrCreateInstance(toastEl).show();
+    }
+
+    /** Updates the print label next to a select. */
+    function updateAssignmentLabel(sel) {
+        var label = sel.nextElementSibling;
+        if (!label || !label.classList.contains('assignment-label')) return;
+        var opt = sel.options[sel.selectedIndex];
+        label.textContent = sel.value === '0' ? '' : (opt ? opt.textContent.trim() : '');
+    }
+
+    /** Sends an assign request; on canForce error opens the force modal. */
+    function saveAssignment(sel, force) {
+        sel.disabled = true;
+        var dayId    = sel.dataset.dayId;
+        var taskId   = sel.dataset.taskId;
+        var personId = sel.value;
+
+        var params = { day_id: dayId, task_id: taskId, person_id: personId };
+        if (force) params.force = '1';
+
+        fetch('{{ path('planning_assign') }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(params).toString(),
+        })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (data.error) {
+                if (data.canForce) {
+                    openForceModal(sel, data.error);
+                } else {
+                    alert(data.error);
+                    location.reload();
+                }
+            } else {
+                updateAssignmentLabel(sel);
+                showToast('{{ 'planning.saved'|trans }}');
+            }
+        })
+        .catch(function () {
+            alert('{{ 'calendar.error.save'|trans }}');
+            location.reload();
+        })
+        .finally(function () {
+            sel.disabled = false;
+        });
+    }
+
+    var _forceModal = null;
+    var _forcePendingSel = null;
+
+    function openForceModal(sel, errorMsg) {
+        var msgEl = document.getElementById('force-assign-message');
+        if (msgEl) msgEl.textContent = errorMsg + ' {{ 'planning.force_modal.body'|trans }}';
+        _forcePendingSel = sel;
+        if (!_forceModal) {
+            var modalEl = document.getElementById('forceAssignModal');
+            if (modalEl) _forceModal = new bootstrap.Modal(modalEl);
+        }
+        if (_forceModal) _forceModal.show();
+    }
+
+    var forceConfirmBtn = document.getElementById('btn-force-confirm');
+    if (forceConfirmBtn) {
+        forceConfirmBtn.addEventListener('click', function () {
+            if (_forceModal) _forceModal.hide();
+            if (_forcePendingSel) {
+                saveAssignment(_forcePendingSel, true);
+                _forcePendingSel = null;
+            }
+        });
+    }
+
+    /** Aktualisiert das Status-Icon für einen Tag/Abteilung on-the-fly. */
+    function updateDayStatus(dayId, blockId) {
+        var selects = document.querySelectorAll(
+            '.assignment-select[data-day-id="' + dayId + '"][data-block="' + blockId + '"]'
+        );
+        var total    = selects.length;
+        var assigned = 0;
+        selects.forEach(function (sel) {
+            if (sel.value !== '0') assigned++;
+        });
+
+        var svgHtml = '', title = '';
+        if (total > 0) {
+            if (assigned === 0) {
+                svgHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" style="vertical-align:middle;"><rect width="14" height="14" rx="2" fill="#dc3545"/><text x="7" y="11" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">!</text></svg>';
+                title   = '0 / ' + total + ' Aufgaben vergeben';
+            } else if (assigned < total) {
+                svgHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" style="vertical-align:middle;"><rect width="14" height="14" rx="2" fill="#ffc107"/><text x="7" y="11" text-anchor="middle" font-size="10" font-weight="bold" fill="#000">!</text></svg>';
+                title   = assigned + ' / ' + total + ' Aufgaben vergeben';
+            } else {
+                svgHtml = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" style="vertical-align:middle;"><rect width="14" height="14" rx="2" fill="#198754"/><polyline points="3,7 6,10 11,4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                title   = 'Alle ' + total + ' Aufgaben vergeben';
+            }
+        }
+
+        document.querySelectorAll(
+            '.day-status-icon[data-day-id="' + dayId + '"][data-block="' + blockId + '"]'
+        ).forEach(function (icon) {
+            icon.innerHTML = svgHtml;
+            icon.title     = title;
+        });
+    }
+
+    // Original-Werte aus der DB beim Laden sichern
+    var originalValues = {};
+    document.querySelectorAll('.assignment-select').forEach(function (sel) {
+        originalValues[sel.dataset.dayId + '_' + sel.dataset.taskId] = sel.value;
+    });
+
+    /** Setzt alle Selects auf den DB-Stand zurück (ohne Seitenreload). */
+    function resetBlock(blockId) {
+        document.querySelectorAll('.assignment-select[data-block="' + blockId + '"]').forEach(function (sel) {
+            var key = sel.dataset.dayId + '_' + sel.dataset.taskId;
+            if (originalValues[key] !== undefined) {
+                sel.value = originalValues[key];
+            }
+        });
+        refreshAllSelects();
+        // Status-Icons für alle Tage im Block aktualisieren
+        var days = new Set();
+        document.querySelectorAll('.assignment-select[data-block="' + blockId + '"]').forEach(function (sel) {
+            days.add(sel.dataset.dayId);
+        });
+        days.forEach(function (dayId) { updateDayStatus(dayId, blockId); });
+    }
+
+    /** Speichert alle Selects eines Abteilungsblocks. */
+    function saveBlock(blockId) {
+        document.querySelectorAll('.assignment-select[data-block="' + blockId + '"]').forEach(function (sel) {
+            saveAssignment(sel);
+        });
+    }
+
+    /** Speichert alle sichtbaren Selects. */
+    function saveAll() {
+        document.querySelectorAll('.assignment-select').forEach(function (sel) {
+            saveAssignment(sel);
+        });
+    }
+
+    document.querySelectorAll('.assignment-select').forEach(function (sel) {
+        sel.addEventListener('change', function () {
+            saveAssignment(this, false);
+            refreshAllSelects();
+            updateDayStatus(this.dataset.dayId, this.dataset.block);
+        });
+    });
+
+    var saveAllBtn = document.getElementById('btn-save-all');
+    if (saveAllBtn) {
+        saveAllBtn.addEventListener('click', function () { saveAll(); });
+    }
+
+    var resetAllBtn = document.getElementById('btn-reset-all');
+    if (resetAllBtn) {
+        resetAllBtn.addEventListener('click', function () {
+            location.reload();
+        });
+    }
+
+    document.querySelectorAll('.btn-save-block').forEach(function (btn) {
+        btn.addEventListener('click', function () { saveBlock(this.dataset.block); });
+    });
+
+    document.querySelectorAll('.btn-reset-block').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            resetBlock(this.dataset.block);
+            showToast('{{ 'planning.reset'|trans }}');
+        });
+    });
+
+    // Für andere Script-Blöcke zugänglich machen
+    window._planningRefreshAll       = refreshAllSelects;
+    window._planningUpdateStatus     = updateDayStatus;
+    window._planningShowToast        = showToast;
+    window._planningUpdateLabel      = updateAssignmentLabel;
+    window._planningDoSave           = saveAssignment;
+
+    // Initialer Durchlauf: bereits belegte Personen deaktivieren
+    refreshAllSelects();
+})();
+</script>
+
+<script>
+(function () {
+    var lockAcquireUrl    = '{{ path('planning_lock_acquire', {departmentId: '__DEPT__'}) }}';
+    var lockReleaseUrl    = '{{ path('planning_lock_release', {departmentId: '__DEPT__'}) }}';
+    var lockReleaseAllUrl = '{{ path('planning_lock_release_all') }}';
+    var lockStatusUrl     = '{{ path('planning_lock_status') }}';
+
+    var msgEditing  = '{{ 'planning.lock.editing'|trans }}';
+    var msgConflict = '{{ 'planning.lock.conflict'|trans }}';
+    var msgReleased = '{{ 'planning.lock.released'|trans }}';
+
+    /** deptId -> true (own locks) */
+    var ownedLocks = {};
+    /** deptId -> lockedBy string (locks held by others) */
+    var foreignLocks = {};
+
+    function acquireUrl(deptId) { return lockAcquireUrl.replace('__DEPT__', deptId); }
+    function releaseUrl(deptId) { return lockReleaseUrl.replace('__DEPT__', deptId); }
+
+    /** Acquires a lock for the department. Returns a Promise resolving to true on success. */
+    function acquireLock(deptId) {
+        return fetch(acquireUrl(deptId), { method: 'POST' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.acquired) {
+                    ownedLocks[deptId] = true;
+                    delete foreignLocks[deptId];
+                    return true;
+                }
+                foreignLocks[deptId] = data.lockedBy || '?';
+                showLockBanner(deptId, data.lockedBy || '?');
+                disableDeptSelects(deptId);
+                return false;
+            })
+            .catch(function () { return false; });
+    }
+
+    function releaseLock(deptId) {
+        delete ownedLocks[deptId];
+        fetch(releaseUrl(deptId), { method: 'POST' }).catch(function () {});
+    }
+
+    function showLockBanner(deptId, lockedBy) {
+        var banner = document.getElementById('lock-banner-' + deptId);
+        var text   = document.getElementById('lock-banner-text-' + deptId);
+        if (!banner || !text) return;
+        text.textContent = msgEditing + ' ' + lockedBy;
+        banner.classList.remove('d-none');
+    }
+
+    function hideLockBanner(deptId) {
+        var banner = document.getElementById('lock-banner-' + deptId);
+        if (banner) banner.classList.add('d-none');
+    }
+
+    function disableDeptSelects(deptId) {
+        document.querySelectorAll('.assignment-select[data-block="' + deptId + '"]').forEach(function (sel) {
+            sel.disabled = true;
+        });
+    }
+
+    function enableDeptSelects(deptId) {
+        document.querySelectorAll('.assignment-select[data-block="' + deptId + '"]').forEach(function (sel) {
+            sel.disabled = false;
+        });
+    }
+
+    /** Polls the server for current lock status and updates the UI. */
+    function pollLockStatus() {
+        fetch(lockStatusUrl)
+            .then(function (r) { return r.json(); })
+            .then(function (status) {
+                // Check for newly released foreign locks → reload to get fresh data.
+                Object.keys(foreignLocks).forEach(function (deptId) {
+                    if (!(deptId in status) || (status[deptId] && ownedLocks[deptId])) {
+                        delete foreignLocks[deptId];
+                        hideLockBanner(deptId);
+                        enableDeptSelects(deptId);
+                        if (window._planningShowToast) window._planningShowToast(msgReleased);
+                        setTimeout(function () { location.reload(); }, 1500);
+                    }
+                });
+
+                // Apply new foreign locks.
+                Object.keys(status).forEach(function (deptId) {
+                    if (!ownedLocks[deptId] && !foreignLocks[deptId]) {
+                        foreignLocks[deptId] = status[deptId].lockedBy;
+                        showLockBanner(deptId, status[deptId].lockedBy);
+                        disableDeptSelects(deptId);
+                    }
+                });
+            })
+            .catch(function () {});
+    }
+
+    /** Sends a heartbeat to extend all own locks. */
+    function heartbeat() {
+        Object.keys(ownedLocks).forEach(function (deptId) {
+            fetch(acquireUrl(deptId), { method: 'POST' }).catch(function () {});
+        });
+    }
+
+    // Intercept select changes: acquire lock before saving.
+    document.querySelectorAll('.assignment-select').forEach(function (sel) {
+        sel.addEventListener('change', function (e) {
+            var deptId = this.dataset.block;
+
+            if (ownedLocks[deptId]) {
+                // Lock already held — proceed (saveAssignment is called by the other listener).
+                return;
+            }
+
+            if (foreignLocks[deptId]) {
+                e.stopImmediatePropagation();
+                this.value = this.dataset.lastSaved || '0';
+                if (window._planningShowToast) window._planningShowToast(msgConflict);
+                return;
+            }
+
+            // Try to acquire lock before allowing the change through.
+            var self = this;
+            var newVal = this.value;
+            e.stopImmediatePropagation();
+            self.disabled = true;
+
+            acquireLock(deptId).then(function (acquired) {
+                self.disabled = false;
+                if (!acquired) {
+                    self.value = self.dataset.lastSaved || '0';
+                    if (window._planningShowToast) window._planningShowToast(msgConflict);
+                    return;
+                }
+                self.value = newVal;
+                // Trigger the original change handling manually.
+                if (window._planningRefreshAll) window._planningRefreshAll();
+                if (window._planningUpdateStatus) window._planningUpdateStatus(self.dataset.dayId, deptId);
+                // saveAssignment is defined in the main planning script; call it here.
+                if (window._planningDoSave) window._planningDoSave(self, false);
+            });
+        }, true); // capture phase — runs before the save listener
+    });
+
+    // Track last saved value so we can revert on conflict.
+    document.querySelectorAll('.assignment-select').forEach(function (sel) {
+        sel.dataset.lastSaved = sel.value;
+        sel.addEventListener('change', function () {
+            this.dataset.lastSaved = this.value;
+        });
+    });
+
+    // Release all locks on page leave.
+    window.addEventListener('pagehide', function () {
+        navigator.sendBeacon(lockReleaseAllUrl);
+    });
+
+    // Poll every 30 s, heartbeat every 60 s.
+    setInterval(pollLockStatus, 30000);
+    setInterval(heartbeat, 60000);
+
+    // Initial poll to catch locks set before this page loaded.
+    pollLockStatus();
+})();
+</script>
+
+{% if is_granted('ROLE_ASSEMBLY_ADMIN') %}
+<script>
+(function () {
+    var suggestBtn = document.getElementById('btn-suggest');
+    var confirmBtn = document.getElementById('btn-suggest-confirm');
+    var notice     = document.getElementById('proposal-notice');
+    var noticeText = document.getElementById('proposal-notice-text');
+    var checks     = document.querySelectorAll('.suggest-check');
+    var suggestUrl = suggestBtn ? suggestBtn.dataset.suggestUrl : '';
+
+    var modal = suggestBtn ? new bootstrap.Modal(document.getElementById('suggestModal')) : null;
+
+    checks.forEach(function (cb) {
+        cb.addEventListener('change', function () {
+            var allChecked = Array.from(checks).every(function (c) { return c.checked; });
+            if (confirmBtn) confirmBtn.disabled = !allChecked;
+        });
+    });
+
+    if (suggestBtn) {
+        suggestBtn.addEventListener('click', function () {
+            checks.forEach(function (c) { c.checked = false; });
+            if (confirmBtn) confirmBtn.disabled = true;
+            modal.show();
+        });
+    }
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function () {
+            confirmBtn.blur();
+            modal.hide();
+            loadProposals();
+        });
+    }
+
+    function loadProposals() {
+        if (suggestBtn) { suggestBtn.disabled = true; suggestBtn.textContent = '{{ 'planning.suggest_loading'|trans }}'; }
+
+        fetch(suggestUrl, { method: 'POST' })
+            .then(function (r) {
+                if (!r.ok) { throw new Error('http:' + r.status); }
+                return r.json();
+            })
+            .then(function (data) {
+                try {
+                    applyProposals(data.proposals || [], data.warnings || []);
+                } catch (e) {
+                    console.error('applyProposals:', e);
+                }
+            })
+            .catch(function (e) {
+                if (e && e.message && e.message.indexOf('http:') === 0) {
+                    alert('{{ 'calendar.error.save'|trans }}');
+                } else {
+                    console.error('Vorschlag-Fehler:', e);
+                }
+            })
+            .finally(function () {
+                if (suggestBtn) {
+                    suggestBtn.disabled = false;
+                    suggestBtn.textContent = '{{ 'planning.suggest_btn'|trans }}';
+                }
+            });
+    }
+
+    function applyProposals(proposals, warnings) {
+        var applied = 0;
+
+        proposals.forEach(function (p) {
+            var sel = document.querySelector(
+                '.assignment-select[data-day-id="' + p.dayId + '"][data-task-id="' + p.taskId + '"]'
+            );
+            if (sel) {
+                sel.value = String(p.personId);
+                if (window._planningUpdateLabel) window._planningUpdateLabel(sel);
+                applied++;
+            }
+        });
+
+        if (window._planningRefreshAll) window._planningRefreshAll();
+
+        var updatedDays = new Set();
+        proposals.forEach(function (p) {
+            var sel = document.querySelector(
+                '.assignment-select[data-day-id="' + p.dayId + '"][data-task-id="' + p.taskId + '"]'
+            );
+            if (sel) {
+                var key = p.dayId + '_' + sel.dataset.block;
+                if (!updatedDays.has(key)) {
+                    updatedDays.add(key);
+                    if (window._planningUpdateStatus) window._planningUpdateStatus(p.dayId, sel.dataset.block);
+                }
+            }
+        });
+
+        if (notice && noticeText) {
+            var msg = applied > 0
+                ? applied + ' {{ 'planning.suggest_applied'|trans }}'
+                : '{{ 'planning.suggest_empty'|trans }}';
+            if (warnings.length > 0) {
+                msg += ' · ' + warnings.length + ' {{ 'planning.suggest_warnings'|trans }}';
+            }
+            noticeText.textContent = msg;
+            notice.classList.remove('d-none');
+        }
+    }
+})();
+</script>
+{% endif %}
+{% endif %}
+{% endblock %}

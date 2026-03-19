@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hilfe – Dienstplaner</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: system-ui, -apple-system, Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #1a1a1a;
+        background: #f8f9fa;
+    }
+    .popup-header {
+        background: #1a56db;
+        color: #fff;
+        padding: 12px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    .popup-header h1 {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+    .popup-header button {
+        background: rgba(255,255,255,0.2);
+        border: none;
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.875rem;
+    }
+    .popup-header button:hover {
+        background: rgba(255,255,255,0.35);
+    }
+    .popup-nav {
+        background: #fff;
+        border-bottom: 1px solid #ddd;
+        padding: 8px 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        position: sticky;
+        top: 45px;
+        z-index: 9;
+    }
+    .popup-nav a {
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        color: #1a56db;
+        text-decoration: none;
+        border: 1px solid #c7d7f5;
+        background: #f0f5ff;
+    }
+    .popup-nav a:hover {
+        background: #1a56db;
+        color: #fff;
+    }
+    .popup-content {
+        padding: 16px 20px;
+    }
+    .help-section {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 16px 20px;
+        margin-bottom: 12px;
+        scroll-margin-top: 100px;
+    }
+    .help-section h2 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1a56db;
+        margin-bottom: 8px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #1a56db;
+    }
+    .help-section ul {
+        padding-left: 16px;
+        margin: 0;
+    }
+    .help-section li {
+        margin-bottom: 3px;
+    }
+    p {
+        margin-bottom: 6px;
+        color: #555;
+        font-size: 0.875rem;
+    }
+</style>
+</head>
+<body>
+
+<div class="popup-header">
+    <h1>{{ 'title.help'|trans }} – Dienstplaner</h1>
+    <button onclick="window.close()">{{ 'help.close'|trans }} ✕</button>
+</div>
+
+<nav class="popup-nav">
+    <a href="#dashboard">{{ 'help.nav.dashboard'|trans }}</a>
+    {% if is_granted('ROLE_PLANER') %}<a href="#planung">{{ 'help.nav.planning'|trans }}</a>{% endif %}
+    <a href="#kalender">{{ 'help.nav.calendar'|trans }}</a>
+    {% if is_granted('ROLE_PLANER') %}<a href="#abwesenheiten">{{ 'help.nav.absences'|trans }}</a>{% endif %}
+    {% if is_granted('ROLE_PLANER') %}<a href="#besondere-daten">{{ 'help.nav.special_dates'|trans }}</a>{% endif %}
+    {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#andere-aufgaben">{{ 'help.nav.other_tasks'|trans }}</a>{% endif %}
+    {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#personen">{{ 'help.nav.persons'|trans }}</a>{% endif %}
+    {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#abteilungen">{{ 'help.nav.departments'|trans }}</a>{% endif %}
+    {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#aufgaben">{{ 'help.nav.tasks'|trans }}</a>{% endif %}
+    {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#suche">{{ 'help.nav.search'|trans }}</a>{% endif %}
+    {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#export">{{ 'help.nav.export'|trans }}</a>{% endif %}
+    {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}<a href="#benutzerverwaltung">{{ 'help.nav.users'|trans }}</a>{% endif %}
+    <a href="#profil">{{ 'help.nav.profile'|trans }}</a>
+</nav>
+
+<div class="popup-content">
+    {{ include('help/_sections.html.twig') }}
+</div>
+
+</body>
+</html>

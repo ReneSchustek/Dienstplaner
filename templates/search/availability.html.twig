@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'search.availability.title'|trans }}{% endblock %}
+{% block page_title %}{{ 'search.availability.title'|trans }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-10">
+        {% include 'search/_nav.html.twig' with {active: 'availability'} %}
+
+        <div class="dp-card mb-4">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-auto">
+                    <label for="date" class="form-label">{{ 'label.day'|trans }}</label>
+                    <input type="date" id="date" name="date" value="{{ dateStr }}" class="form-control" required>
+                </div>
+                <div class="col-auto">
+                    <label for="task" class="form-label">{{ 'nav.tasks'|trans }} ({{ 'search.optional'|trans }})</label>
+                    <select id="task" name="task" class="form-select">
+                        <option value="">– {{ 'search.all'|trans }} –</option>
+                        {% for task in tasks %}
+                        <option value="{{ task.id }}"{{ taskId == task.id ? ' selected' : '' }}>{{ task.department.name }} › {{ task.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">{{ 'btn.search'|trans }}</button>
+                </div>
+            </form>
+        </div>
+
+        {% if date is not null %}
+        <div class="dp-card">
+            <h6 style="margin-bottom: 12px;">{{ 'search.availability.result'|trans }}: {{ date|date('d.m.Y') }}</h6>
+            {% if available is empty %}
+            <p class="text-muted">{{ 'search.availability.none'|trans }}</p>
+            {% else %}
+            <ul class="list-unstyled mb-0" style="column-count: 2;">
+                {% for person in available %}
+                <li><a href="{{ path('search_person_detail', {id: person.id}) }}">{{ person.name }}</a></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

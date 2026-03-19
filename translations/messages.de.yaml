@@ -1,0 +1,514 @@
+# Navigation
+nav.dashboard: Dashboard
+nav.planning: Planung
+nav.calendar: Kalender
+nav.absences: Abwesenheiten
+nav.external_tasks: Andere Aufgaben
+nav.special_dates: Besondere Daten
+nav.persons: Personen
+nav.departments: Abteilungen
+nav.tasks: Aufgaben
+nav.export: Export
+nav.assemblies: Versammlungen
+nav.users: Benutzer
+nav.profile: "Mein Profil"
+nav.2fa: "Zwei-Faktor-Auth."
+nav.search: Suche & Übersichten
+nav.help: Hilfe
+nav.legal: Impressum
+nav.privacy: Datenschutz
+nav.section.management: Verwaltung
+nav.section.administration: Administration
+nav.section.system: System
+nav.logout: Abmelden
+
+# Seitentitel
+title.dashboard: Dashboard
+title.planning: Planung
+title.calendar: Kalender
+title.absences: Abwesenheiten
+title.external_tasks: Andere Aufgaben
+title.special_dates: Besondere Daten
+title.special_date.new: Neuer besonderer Termin
+title.special_date.edit: Besonderer Termin bearbeiten
+title.persons: Personen
+title.departments: Abteilungen
+title.tasks: Aufgaben
+title.export: Export
+title.assemblies: Versammlungen
+title.users: Benutzerverwaltung
+title.2fa: "Zwei-Faktor-Authentifizierung"
+title.help: Hilfe
+help.nav.dashboard: Dashboard
+help.nav.planning: Planung
+help.nav.calendar: Kalender
+help.nav.absences: Abwesenheiten
+help.nav.special_dates: Besondere Daten
+help.nav.other_tasks: Andere Aufgaben
+help.nav.persons: Personen
+help.nav.departments: Abteilungen
+help.nav.tasks: Aufgaben
+help.nav.search: Suche
+help.nav.export: Export
+help.nav.users: Benutzerverwaltung
+help.nav.profile: Profil & Konto
+help.close: Schließen
+help.show_all: Alle Themen anzeigen
+help.full_page: Vollständige Hilfe
+title.legal: Impressum
+title.privacy: Datenschutzerklärung
+
+# Schaltflächen
+btn.save: Speichern
+btn.save_all: Alle speichern
+btn.reset: Zurücksetzen
+btn.reset_hint: Änderungen verwerfen und Daten neu laden
+btn.cancel: Abbrechen
+btn.back: Zurück
+btn.delete: Löschen
+btn.edit: Bearbeiten
+btn.show: Anzeigen
+btn.login: Anmelden
+btn.new.assembly: + Neue Versammlung
+btn.new.department: + Neue Abteilung
+btn.new.person: + Neue Person
+btn.new.task: + Neue Aufgabe
+btn.new.absence: + Neue Abwesenheit
+btn.new.external_task: + Neue andere Aufgabe
+btn.new.special_date: + Neuer besonderer Termin
+btn.new.user: + Neuer Benutzer
+btn.add_absence: + Abwesenheit eintragen
+btn.download.pdf: PDF herunterladen
+btn.download.excel: Excel herunterladen
+btn.teamup.import: "TeamUp importieren"
+btn.search: Suchen
+btn.details: Details
+
+# Tabellenspalten
+table.name: Name
+table.address: Adresse
+table.weekdays: Wochentage
+table.departments: Abteilungen
+table.assembly: Versammlung
+table.department: Abteilung
+table.tasks: Aufgaben
+table.person: Person
+table.email: E-Mail
+table.phone: Telefon
+table.role: Rolle
+table.from: Von
+table.to: Bis
+table.note: Anmerkung
+table.date: Datum
+
+# Formular-Labels
+label.name: Name
+label.street: "Straße"
+label.zip: PLZ
+label.city: Stadt
+label.weekdays: Versammlungstage
+label.plan_name: Plan-Name
+label.line_color: Linienfarbe
+label.footer_text: Freitext (unter der Planung)
+label.page_size: Zeilen pro Seite
+label.email: E-Mail
+label.password: Passwort
+label.password.new: "Neues Passwort (leer lassen = unverändert)"
+label.role: Rolle
+label.assembly: Versammlung
+label.department: "Abteilung"
+label.department.planer: "Abteilung (nur für Planer)"
+label.color: Farbe
+label.start_date: Von
+label.end_date: Bis
+label.note: Anmerkung
+label.person: Person
+label.person.calendar: "Verknüpfte Person (für Kalender)"
+label.phone: Telefon
+label.theme: Theme
+label.language: Sprache
+label.year: Jahr
+label.month: Monat
+label.day: Tag
+label.description: Beschreibung
+label.remember_me: Angemeldet bleiben
+label.teamup_url: "TeamUp ICS-URL (optional)"
+label.tasks: "Zugeordnete Aufgaben"
+label.2fa_required: "2FA erzwingen (Pflicht für diesen Benutzer)"
+label.special_date.type: Typ
+label.from: Von
+label.to: Bis
+label.total: Gesamt
+
+# Flash-Meldungen
+flash.assembly.created: Versammlung wurde angelegt.
+flash.assembly.saved: Versammlung wurde gespeichert.
+flash.assembly.deleted: Versammlung wurde gelöscht.
+flash.department.created: Abteilung wurde angelegt.
+flash.department.saved: Abteilung wurde gespeichert.
+flash.department.deleted: Abteilung wurde gelöscht.
+flash.person.created: Person wurde angelegt.
+flash.person.saved: Person wurde gespeichert.
+flash.person.deleted: Person wurde gelöscht.
+flash.person.duplicate_name: "Eine Person mit diesem Namen (oder einem gleichwertigen Namen) existiert bereits in dieser Versammlung."
+flash.task.created: Aufgabe wurde angelegt.
+flash.task.saved: Aufgabe wurde gespeichert.
+flash.task.deleted: Aufgabe wurde gelöscht.
+flash.absence.created: Abwesenheit wurde eingetragen.
+flash.absence.saved: Abwesenheit wurde gespeichert.
+flash.absence.deleted: Abwesenheit wurde gelöscht.
+flash.external_task.created: Andere Aufgabe wurde eingetragen.
+flash.external_task.saved: Andere Aufgabe wurde gespeichert.
+flash.external_task.deleted: Andere Aufgabe wurde gelöscht.
+flash.special_date.created: Besonderer Termin wurde angelegt.
+flash.special_date.saved: Besonderer Termin wurde gespeichert.
+flash.special_date.deleted: Besonderer Termin wurde gelöscht.
+flash.user.created: Benutzer wurde angelegt.
+flash.user.saved: Benutzer wurde gespeichert.
+flash.user.deleted: Benutzer wurde gelöscht.
+flash.user.invitation_sent: Benutzer wurde angelegt und Einladung per E-Mail versendet.
+flash.mail.error: "E-Mail konnte nicht gesendet werden. Bitte wende dich an den Administrator."
+flash.user.password_reset: Neues Einmal-Passwort wurde generiert und per E-Mail versendet.
+flash.user.calendar_link_sent: Kalenderlink wurde per E-Mail versendet.
+flash.user.no_calendar_token: Dieser Benutzer hat keinen Kalenderlink.
+flash.user.already_linked: Diese Person hat bereits ein Benutzerkonto.
+flash.user.invalid_email: Ungültige E-Mail-Adresse.
+btn.send_calendar_link: Kalenderlink senden
+btn.create_user: Benutzerkonto anlegen
+user.no_linked_account: Kein Benutzerkonto verknüpft.
+role.user: Benutzer
+role.planer: Planer
+role.assembly_admin: Versammlungsadmin
+btn.reset_password: Passwort zurücksetzen
+user.reset_password_hint: Generiert ein neues Einmal-Passwort und sendet es per E-Mail an den Benutzer.
+user.reset_password_confirm: Wirklich ein neues Passwort generieren und per E-Mail senden?
+flash.theme.saved: Theme gespeichert.
+flash.2fa.enabled: "Zwei-Faktor-Authentifizierung wurde aktiviert."
+flash.2fa.disabled: "Zwei-Faktor-Authentifizierung wurde deaktiviert."
+flash.2fa.code_invalid: "Ungültiger Code. Bitte erneut versuchen."
+flash.2fa.backup_codes_regenerated: "Backup-Codes wurden neu generiert."
+flash.csrf.invalid: "Ungültige Anfrage (CSRF)."
+flash.teamup.imported: "%count% Abwesenheit(en) importiert."
+flash.teamup.no_url: "Kein TeamUp-Kalenderlink konfiguriert."
+flash.teamup.no_url_hint: "Bitte wende dich an den Administrator."
+flash.teamup.configure_link: "Jetzt einrichten →"
+flash.teamup.error: "Fehler beim Import."
+flash.teamup.error.fetch: "Die TeamUp-URL konnte nicht abgerufen werden. Bitte URL und Netzwerkverbindung prüfen."
+
+# Bestätigungen
+confirm.delete: Wirklich löschen?
+
+# Leere Listen
+msg.no.assemblies: Keine Versammlungen vorhanden.
+msg.no.departments: Keine Abteilungen vorhanden.
+msg.no.persons: Keine Personen vorhanden.
+msg.no.tasks: Keine Aufgaben vorhanden.
+msg.no.absences: Keine Abwesenheiten vorhanden.
+msg.no.external_tasks: Keine anderen Aufgaben vorhanden.
+msg.no.special_dates: Keine besonderen Termine vorhanden.
+msg.no.users: Keine Benutzer vorhanden.
+
+# Besondere Termine
+special_date.type.memorial: "Gedächtnismahl"
+special_date.type.congress: Kongress
+special_date.type.service_week: Dienstwoche
+special_date.type.misc: Sonstiges
+
+# Planung
+planning.no_days: "Für diesen Monat sind keine Planungstage konfiguriert."
+planning.free: "– frei –"
+planning.no_assembly: "Kein Versammlungszugriff konfiguriert."
+planning.label.memorial: "Gedächtnismahl"
+planning.label.congress: Kongress
+planning.label.service_week: Dienstwoche
+planning.label.misc: Sonstiges
+
+# Kalender / Abwesenheitsmodal
+calendar.no_person: "Kein Personenprofil verknüpft – Einträge nur lesbar."
+calendar.modal.new: Neue Abwesenheit
+calendar.modal.edit: Abwesenheit bearbeiten
+calendar.confirm.delete: Abwesenheit wirklich löschen?
+calendar.error.save: Fehler beim Speichern.
+
+# Monatsnamen
+month.1: Januar
+month.2: Februar
+month.3: "März"
+month.4: April
+month.5: Mai
+month.6: Juni
+month.7: Juli
+month.8: August
+month.9: September
+month.10: Oktober
+month.11: November
+month.12: Dezember
+
+# Tagesabkürzungen
+day.Mon: Mo
+day.Tue: Di
+day.Wed: Mi
+day.Thu: Do
+day.Fri: Fr
+day.Sat: Sa
+day.Sun: So
+
+# Export
+export.select_month: Monat wählen
+export.download: Download
+export.format.word: Word (.docx)
+
+# Login
+login.subtitle: Bitte melde dich an
+login.error: Fehler
+
+# Admin
+admin.assembly.switch: Versammlung
+admin.assembly.reset: "Zurück zur eigenen Versammlung"
+
+# Dashboard
+dashboard.persons: Personen
+dashboard.assemblies: Versammlungen
+dashboard.quick_access: Schnellzugriff
+dashboard.to_planning: Zur Planung
+dashboard.to_calendar: Zum Kalender
+dashboard.manage_absences: Abwesenheiten verwalten
+dashboard.no_assembly: "Kein Versammlungszugang konfiguriert."
+dashboard.admin_no_assembly_title: "Keine Versammlung zugeordnet."
+dashboard.admin_no_assembly_hint: "Bitte Versammlung anlegen und dem eigenen Benutzerkonto zuordnen."
+dashboard.current_plan: "Aktueller Dienstplan"
+
+# Suche & Übersichten
+search.persons.title: Personensuche
+search.tasks.title: Aufgabensuche
+search.availability.title: "Verfügbarkeitssuche"
+search.persons.label: Name
+search.persons.placeholder: "Vor- oder Nachname eingeben"
+search.tasks.label: Aufgabenname
+search.tasks.placeholder: "Aufgabenname eingeben"
+search.no_results: Keine Ergebnisse gefunden.
+search.all: Alle
+search.optional: optional
+search.results_count: Einträge
+search.tab.persons: Personen
+search.tab.tasks: Aufgaben
+search.tab.availability: "Verfügbarkeit"
+search.tab.overview: "Übersichten"
+search.overview.task_persons: "Aufgaben → Personen"
+search.overview.person_tasks: "Personen → Aufgaben"
+search.overview.history: Planungshistorie
+search.overview.absences: "Abwesenheitsübersicht"
+search.overview.task_stats: "Aufgabenstatistik"
+search.tab.fairness: "Fairness & Rotation"
+search.fairness.title: "Fairness & Rotation"
+search.fairness.person: Person
+search.fairness.total: Gesamt
+search.fairness.avg: "Ø Durchschnitt"
+search.fairness.over: "Überbeauftragt (>+20%)"
+search.fairness.under: "Unterbeauftragt (<-20%)"
+search.fairness.ok: "Im Rahmen (±20%)"
+search.person.master_data: Stammdaten
+search.person.task_freq: "Häufigkeit pro Aufgabe"
+search.person.history: Planungshistorie
+search.person.count: Anzahl
+search.task.eligible: "Berechtigte Personen"
+search.task.no_eligible: "Keine Personen zugeordnet."
+search.task.last_assignment: "Zuletzt eingeplant"
+search.task.never_assigned: "Noch nie eingeplant"
+search.availability.result: "Verfügbare Personen am"
+search.availability.none: "Keine verfügbaren Personen gefunden."
+
+# Zwei-Faktor-Authentifizierung
+2fa.title: "Zwei-Faktor-Authentifizierung"
+2fa.instructions: "Bitte gib den Code aus deiner Authenticator-App ein."
+2fa.code_label: "Authenticator-Code"
+2fa.submit: "Bestätigen"
+2fa.status_title: "Status"
+2fa.status.enabled: "2FA aktiv"
+2fa.status.disabled: "2FA inaktiv"
+2fa.required_by_admin: "Vom Admin erzwungen"
+2fa.setup_title: "Einrichtung"
+2fa.setup_instructions: "Scanne den QR-Code mit deiner Authenticator-App (z. B. Google Authenticator, Aegis)."
+2fa.setup_manual_code: "Oder gib diesen Code manuell ein:"
+2fa.setup_confirm_instructions: "Gib anschließend den generierten 6-stelligen Code ein, um die Einrichtung abzuschließen."
+2fa.disable_title: "2FA deaktivieren"
+2fa.btn.setup: "2FA einrichten"
+2fa.btn.confirm: "Bestätigen & aktivieren"
+2fa.btn.disable: "2FA deaktivieren"
+2fa.btn.regenerate_backup_codes: "Neue Backup-Codes generieren"
+2fa.backup_codes.new_title: "Backup-Codes"
+2fa.backup_codes.save_hint: "Speichere diese Codes sicher. Jeder Code kann nur einmal verwendet werden."
+2fa.backup_codes.count: "%count% Backup-Code(s) verbleibend."
+2fa.backup_codes.regenerate_title: "Backup-Codes neu generieren"
+
+# Sprachschalter
+lang.de: "🇩🇪 DE"
+lang.en: "🇬🇧 EN"
+lang.fr: "🇫🇷 FR"
+
+# Passwort-Reset
+title.password_reset: "Passwort vergessen"
+title.change_password: "Passwort ändern"
+login.forgot_password: "Passwort vergessen?"
+password_reset.hint: "Gib deine E-Mail-Adresse ein. Du erhältst ein Einmal-Passwort."
+password_reset.sent_title: "E-Mail versendet"
+password_reset.sent_hint: "Falls die E-Mail-Adresse bekannt ist, wurde ein Einmal-Passwort versandt. Bitte prüfe dein Postfach."
+change_password.hint: "Bitte gib ein neues Passwort ein (mindestens 8 Zeichen)."
+modal.force_password.title: "Passwort festlegen"
+modal.force_password.intro: "Dein Konto erfordert ein neues Passwort. Bitte lege jetzt ein persönliches Passwort fest, bevor du fortfahren kannst."
+btn.send_reset: "Einmal-Passwort anfordern"
+btn.back_to_login: "Zurück zur Anmeldung"
+btn.save_password: "Passwort speichern"
+label.new_password: "Neues Passwort"
+label.password_confirm: "Passwort bestätigen"
+flash.password.changed: "Passwort erfolgreich geändert."
+flash.password.too_short: "Das Passwort muss mindestens 8 Zeichen lang sein."
+flash.password.mismatch: "Die Passwörter stimmen nicht überein."
+
+# 2FA Methoden
+2fa.method_title: "2FA-Methode"
+2fa.method.none: "Deaktiviert"
+2fa.method.totp: "Authenticator-App (TOTP)"
+2fa.method.email: "E-Mail-Code"
+flash.2fa.method_saved: "2FA-Methode gespeichert."
+2fa.policy.disabled_hint: "2FA ist für diese Versammlung deaktiviert."
+
+# Assembly 2FA-Richtlinie
+assembly.2fa_policy: "2FA-Einstellung"
+assembly.2fa_policy.disabled: "Deaktiviert"
+assembly.2fa_policy.user_choice: "Benutzersteuerung"
+assembly.2fa_policy.totp: "App (TOTP)"
+assembly.2fa_policy.email: "E-Mail-Code"
+assembly.weekdays.invalid: "Es muss genau ein Wochentag (Mo–Fr) und ein Wochenendtag (Sa oder So) gewählt sein."
+
+# Kalender-Token (öffentlicher Kalenderlink)
+calendar_token.section_title: "Persönlicher Kalender-Link"
+calendar_token.description: "Über diesen Link ist der eigene Abwesenheitskalender ohne Anmeldung erreichbar. Der Link sollte vertraulich behandelt werden."
+calendar_token.link_label: "Dein persönlicher Kalender-Link"
+calendar_token.btn_generate: "Link generieren"
+calendar_token.btn_reset: "Link neu generieren"
+calendar_token.btn_revoke: "Link deaktivieren"
+calendar_token.btn_copy: "Kopieren"
+calendar_token.no_token: "Kein aktiver Kalender-Link vorhanden."
+calendar_token.title: "Persönlicher Kalender"
+calendar_token.readonly_note: "Nur eigene Abwesenheiten"
+calendar_token.absent: "Abwesend"
+calendar_token.absences: "Abwesenheiten"
+calendar_token.no_absences: "Keine Abwesenheiten eingetragen."
+calendar_token.hint: "Dieser Kalender zeigt deine Abwesenheiten, anderen Aufgaben und geplanten Einsätze."
+flash.calendar_token.generated: "Kalender-Link wurde generiert."
+flash.calendar_token.revoked: "Kalender-Link wurde deaktiviert."
+flash.assembly_token.generated: "Versammlungs-Kalenderlink wurde generiert."
+flash.assembly_token.revoked: "Versammlungs-Kalenderlink wurde deaktiviert."
+assembly_token.title: "Öffentliche Kalender-Links"
+assembly_token.absence.title: "Abwesenheits-Kalender"
+assembly_token.absence.description: "Zeigt alle Abwesenheiten der Versammlung ohne Anmeldung. Der Link sollte vertraulich behandelt werden."
+assembly_token.calendar.title: "Vollständiger Kalender"
+assembly_token.calendar.description: "Zeigt alle Ereignisse der Versammlung (Abwesenheiten, Zuordnungen, Aufgaben) ohne Anmeldung. Der Link sollte vertraulich behandelt werden."
+assembly_token.no_token: "Kein aktiver Link vorhanden."
+assembly_token.btn_generate: "Link generieren"
+assembly_token.btn_reset: "Link neu generieren"
+assembly_token.btn_revoke: "Link deaktivieren"
+assembly_token.confirm_revoke: "Wirklich deaktivieren? Der bisherige Link wird ungültig."
+assembly_token.no_absences: "Keine Abwesenheiten im gewählten Zeitraum."
+nav.assembly_tokens: "Kalender-Links"
+calendar_token.external_tasks: "Andere Aufgaben"
+calendar_token.no_external_tasks: "Keine anderen Aufgaben eingetragen."
+calendar_token.btn_add_external_task: "+ Aufgabe eintragen"
+calendar_token.assignments: "Geplante Einsätze"
+calendar_token.no_assignments: "Keine geplanten Einsätze."
+calendar_token.ext_task_label: "Beschreibung"
+calendar_token.ext_task_date: "Datum"
+calendar_token.special_dates: "Besondere Daten"
+calendar_token.no_special_dates: "Keine besonderen Termine."
+
+# Benutzerprofil
+title.profile: "Mein Profil"
+profile.section_title: "Mein Profil"
+profile.name: "Name (Anzeigename)"
+profile.email: "E-Mail-Adresse"
+profile.password_section: "Passwort ändern"
+profile.current_password: "Aktuelles Passwort"
+profile.email_taken: "Diese E-Mail-Adresse ist bereits vergeben."
+profile.current_password_wrong: "Das aktuelle Passwort ist falsch."
+flash.profile.saved: "Profil wurde gespeichert."
+flash.profile.password_changed: "Passwort wurde geändert."
+flash.profile.email_required: "E-Mail-Adresse darf nicht leer sein."
+profile.danger_zone: "Gefahrenzone"
+profile.delete_account: "Konto löschen"
+profile.delete_account_hint: "Das Konto wird unwiderruflich gelöscht. Planungsdaten bleiben erhalten."
+profile.delete_account_confirm: "Konto wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+flash.account.deleted: "Dein Konto wurde gelöscht."
+planning.suggest_btn: "Vorschlag generieren"
+planning.suggest_loading: "Berechne..."
+planning.suggest_modal.title: "Vorschlag generieren"
+planning.suggest_modal.hint: "Bitte bestätige, dass die folgenden Daten vollständig eingetragen sind."
+planning.suggest_modal.check1: "Abwesenheiten vollständig eingetragen?"
+planning.suggest_modal.check2: "Externe Aufgaben vollständig eingetragen?"
+planning.suggest_modal.check3: "Besondere Termine (Kongress, Gedächtnisfeier) eingetragen?"
+planning.suggest_modal.confirm: "Vorschlag eintragen"
+planning.suggest_proposals: "Planungsvorschläge"
+planning.suggest_accept: "Übernehmen"
+planning.suggest_skip: "Überspringen"
+planning.suggest_accept_all: "Alle übernehmen"
+planning.suggest_applied: "Vorschläge eingetragen."
+planning.suggest_empty: "Keine Vorschläge gefunden."
+planning.suggest_warnings: "nicht besetzbare Slots"
+planning.saved: "Gespeichert."
+planning.reset: "Zurückgesetzt."
+planning.force_modal.title: "Trotzdem einplanen?"
+planning.force_modal.body: "Die Person ist an diesem Tag als abwesend oder anderweitig eingeplant. Trotzdem einplanen?"
+planning.force_modal.confirm: "Trotzdem einplanen"
+planning.notify_btn: "Benachrichtigungen versenden"
+planning.notify_confirm: "Für diesen Monat Benachrichtigungen an alle eingeplanten Personen versenden?"
+planning.notify_sent: "Benachrichtigungen versandt"
+planning.notify_skipped: "Übersprungen (kein Konto/E-Mail)"
+planning.lock.editing: "Wird bearbeitet von"
+planning.lock.conflict: "Diese Abteilung wird gerade von einem anderen Planer bearbeitet."
+planning.lock.released: "Sperre aufgehoben – Seite wird aktualisiert."
+btn.teamup_import: "TeamUp-Import"
+btn.import_confirm: "Import bestätigen"
+btn.print: "Drucken"
+import.review_title: "Import prüfen"
+import.review_hint: "Bitte prüfen und ggf. korrigieren. Nur markierte Einträge werden importiert."
+import.no_events: "Keine Einträge im Kalender gefunden."
+import.ics_summary: "Kalendereintrag"
+import.match_type: "Zuordnung"
+import.match_exact: "Exakt"
+import.match_partial: "Teilweise"
+import.match_none: "Nicht gefunden"
+import.no_person: "keine Person"
+import.upload_title: "PDF importieren"
+import.upload_hint: "ICS-Datei importieren (TeamUp)"
+import.pdf_upload_hint: "Wähle eine PDF-Datei aus. Zeilen mit Datumsangaben und Personennamen werden automatisch erkannt."
+import.ics_file: "ICS-Datei"
+import.pdf_file: "PDF-Datei"
+import.parse_btn: "Importieren"
+import.no_file: "Keine Datei ausgewählt."
+import.file_empty: "Die Datei ist leer oder konnte nicht gelesen werden."
+import.file_not_pdf: "Bitte nur PDF-Dateien hochladen."
+
+# Pagination & Filter
+pagination.label: Seitennavigation
+pagination.previous: "‹ Zurück"
+pagination.next: "Weiter ›"
+pagination.page_of: "Seite %page% von %pages%"
+filter.search_placeholder: "Suchen..."
+filter.results_for: '%count% Ergebnis(se) für "%q%"'
+filter.all_months: "Alle Monate"
+filter.all_years: "Alle Jahre"
+
+# E-Mail-Vorlagen
+label.mail_templates: "E-Mail-Vorlagen"
+label.mail_invitation: "Einladung"
+label.mail_invitation_subject: "Betreff: Einladung"
+label.mail_invitation_body: "Inhalt: Einladung"
+label.mail_password_reset: "Passwort zurücksetzen"
+label.mail_password_reset_subject: "Betreff: Passwort zurücksetzen"
+label.mail_password_reset_body: "Inhalt: Passwort zurücksetzen"
+label.mail_calendar_link: "Kalenderlink"
+label.mail_calendar_link_subject: "Betreff: Kalenderlink"
+label.mail_calendar_link_body: "Inhalt: Kalenderlink"
+label.placeholders_available: "Verfügbare Platzhalter:"
+label.generate_password: "Passwort generieren"
+btn.generate: "Generieren"
