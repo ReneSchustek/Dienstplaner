@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ person.name }}{% endblock %}
+{% block page_title %}{{ person.name }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-10">
+        <div class="mb-3">
+            <a href="{{ path('search_persons') }}" class="btn btn-sm btn-outline-secondary">← {{ 'btn.back'|trans }}</a>
+            {% if is_granted('ROLE_PLANER') %}
+            <a href="{{ path('person_edit', {id: person.id}) }}" class="btn btn-sm btn-outline-primary ms-1">{{ 'btn.edit'|trans }}</a>
+            {% endif %}
+        </div>
+
+        <div class="dp-card mb-4">
+            <h5 style="font-weight: 600; margin-bottom: 12px;">{{ 'search.person.master_data'|trans }}</h5>
+            <dl class="row mb-0" style="font-size: 0.9rem;">
+                <dt class="col-sm-3">{{ 'table.name'|trans }}</dt>
+                <dd class="col-sm-9">{{ person.name }}</dd>
+                <dt class="col-sm-3">{{ 'table.email'|trans }}</dt>
+                <dd class="col-sm-9">{{ person.email ?? '–' }}</dd>
+                <dt class="col-sm-3">{{ 'table.phone'|trans }}</dt>
+                <dd class="col-sm-9">{{ person.phone ?? '–' }}</dd>
+            </dl>
+        </div>
+
+        <div class="dp-card mb-4">
+            <h5 style="font-weight: 600; margin-bottom: 12px;">{{ 'search.person.task_freq'|trans }}</h5>
+            {% if countByTask is empty %}
+            <p class="text-muted">{{ 'search.no_results'|trans }}</p>
+            {% else %}
+            <table class="table table-sm">
+                <thead><tr><th>{{ 'nav.tasks'|trans }}</th><th>{{ 'search.person.count'|trans }}</th></tr></thead>
+                <tbody>
+                    {% for taskId, count in countByTask %}
+                    {% set foundTask = null %}
+                    {% for a in assignments %}{% if a.task.id == taskId %}{% set foundTask = a.task %}{% endif %}{% endfor %}
+                    <tr>
+                        <td>{% if foundTask %}{{ foundTask.department.name }} › {{ foundTask.name }}{% else %}#{{ taskId }}{% endif %}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+
+        <div class="dp-card mb-4">
+            <h5 style="font-weight: 600; margin-bottom: 12px;">{{ 'search.person.history'|trans }}</h5>
+            <form method="get" class="row g-2 align-items-end mb-3">
+                <div class="col-auto">
+                    <label class="form-label" for="from">{{ 'table.from'|trans }}</label>
+                    <input type="date" id="from" name="from" value="{{ fromStr }}" class="form-control form-control-sm">
+                </div>
+                <div class="col-auto">
+                    <label class="form-label" for="to">{{ 'table.to'|trans }}</label>
+                    <input type="date" id="to" name="to" value="{{ toStr }}" class="form-control form-control-sm">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-sm btn-secondary">{{ 'btn.search'|trans }}</button>
+                </div>
+            </form>
+            {% if assignments is empty %}
+            <p class="text-muted">{{ 'search.no_results'|trans }}</p>
+            {% else %}
+            <table class="table table-sm">
+                <thead><tr><th>{{ 'table.date'|trans }}</th><th>{{ 'table.department'|trans }}</th><th>{{ 'nav.tasks'|trans }}</th></tr></thead>
+                <tbody>
+                    {% for a in assignments %}
+                    <tr>
+                        <td>{{ a.day.date|date('d.m.Y') }}</td>
+                        <td>{{ a.task.department.name }}</td>
+                        <td>{{ a.task.name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+
+        <div class="dp-card">
+            <h5 style="font-weight: 600; margin-bottom: 12px;">{{ 'nav.absences'|trans }}</h5>
+            {% if absences is empty %}
+            <p class="text-muted">{{ 'search.no_results'|trans }}</p>
+            {% else %}
+            <table class="table table-sm">
+                <thead><tr><th>{{ 'table.from'|trans }}</th><th>{{ 'table.to'|trans }}</th><th>{{ 'table.note'|trans }}</th></tr></thead>
+                <tbody>
+                    {% for a in absences %}
+                    <tr>
+                        <td>{{ a.startDate|date('d.m.Y') }}</td>
+                        <td>{{ a.endDate|date('d.m.Y') }}</td>
+                        <td>{{ a.note ?? '' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

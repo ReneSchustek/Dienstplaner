@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ assembly.name }} – {{ 'assembly_token.calendar.title'|trans }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <style>
+        body { background: #f5f5f5; margin: 0; }
+        .badge-absence    { background: #fd7e14; color: #fff; border-radius: 3px; padding: 1px 4px; font-size: 0.7em; display: block; margin-top: 1px; }
+        .badge-assignment { background: #198754; color: #fff; border-radius: 3px; padding: 1px 4px; font-size: 0.7em; display: block; margin-top: 1px; }
+        .badge-ext-task   { background: #0dcaf0; color: #000; border-radius: 3px; padding: 1px 4px; font-size: 0.7em; display: block; margin-top: 1px; }
+        .calendar-grid    { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+        .calendar-day     { min-height: 60px; background: #fff; padding: 4px 6px; border-radius: 4px; font-size: 0.85em; }
+        .calendar-day.other-month { background: #f0f0f0; color: #bbb; }
+        .calendar-day.today       { border: 2px solid #0d6efd; }
+        .calendar-weekday { background: #dee2e6; text-align: center; font-weight: 600; font-size: 0.8em; padding: 4px; }
+    </style>
+</head>
+<body>
+
+{{ include('public/_header.html.twig', {appName: assembly.name, subtitle: 'assembly_token.calendar.title'|trans}) }}
+
+<div class="container py-4" style="max-width: 960px">
+
+    {% set prevMonth = month == 1 ? 12 : month - 1 %}
+    {% set prevYear  = month == 1 ? year - 1 : year %}
+    {% set nextMonth = month == 12 ? 1 : month + 1 %}
+    {% set nextYear  = month == 12 ? year + 1 : year %}
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <a href="{{ path('assembly_public_calendar', {token: token, year: prevYear, month: prevMonth}) }}" class="btn btn-outline-secondary btn-sm">&laquo;</a>
+        <strong>{{ ('month.' ~ month)|trans }} {{ year }}</strong>
+        <a href="{{ path('assembly_public_calendar', {token: token, year: nextYear, month: nextMonth}) }}" class="btn btn-outline-secondary btn-sm">&raquo;</a>
+    </div>
+
+    {# Build lookup maps #}
+    {% set absencesByDate = {} %}
+    {% for absence in absences %}
+        {% set d = absence.startDate|date('Y-m-d') %}
+        {# Show on start date only for list view #}
+        {% set absencesByDate = absencesByDate|merge({(d): (absencesByDate[d] is defined ? absencesByDate[d] : [])|merge([absence])}) %}
+    {% endfor %}
+
+    {% set assignmentsByDate = {} %}
+    {% for a in assignments %}
+        {% set d = a.day.date|date('Y-m-d') %}
+        {% set assignmentsByDate = assignmentsByDate|merge({(d): (assignmentsByDate[d] is defined ? assignmentsByDate[d] : [])|merge([a])}) %}
+    {% endfor %}
+
+    {% set extTasksByDate = {} %}
+    {% for et in extTasks %}
+        {% set d = et.day.date|date('Y-m-d') %}
+        {% set extTasksByDate = extTasksByDate|merge({(d): (extTasksByDate[d] is defined ? extTasksByDate[d] : [])|merge([et])}) %}
+    {% endfor %}
+
+    {# Calendar Grid #}
+    <div class="calendar-grid mb-4">
+        {% for wd in ['day.Mon', 'day.Tue', 'day.Wed', 'day.Thu', 'day.Fri', 'day.Sat', 'day.Sun'] %}
+            <div class="calendar-weekday">{{ wd|trans }}</div>
+        {% endfor %}
+
+        {% set firstWeekday = date(year ~ '-' ~ (month < 10 ? '0' ~ month : month) ~ '-01')|date('N')|number_format %}
+        {% for i in 1..(firstWeekday - 1) %}
+            <div class="calendar-day other-month"></div>
+        {% endfor %}
+
+        {% set daysInMonth = date(year ~ '-' ~ (month < 10 ? '0' ~ month : month) ~ '-01')|date('t')|number_format %}
+        {% set today = 'now'|date('Y-m-d') %}
+
+        {% for d in 1..daysInMonth %}
+            {% set dayStr = year ~ '-' ~ (month < 10 ? '0' ~ month : month) ~ '-' ~ (d < 10 ? '0' ~ d : d) %}
+            {% set isToday = dayStr == today %}
+            {% set dayAbsences    = absencesByDate[dayStr] is defined ? absencesByDate[dayStr] : [] %}
+            {% set dayAssignments = assignmentsByDate[dayStr] is defined ? assignmentsByDate[dayStr] : [] %}
+            {% set dayExtTasks    = extTasksByDate[dayStr] is defined ? extTasksByDate[dayStr] : [] %}
+
+            <div class="calendar-day {{ isToday ? 'today' : '' }} {{ (dayAbsences|length > 0 or dayAssignments|length > 0 or dayExtTasks|length > 0) ? 'has-event' : '' }}">
+                <div class="fw-semibold">{{ d }}</div>
+                {% for abs in dayAbsences %}
+                    <span class="badge-absence" title="{{ abs.person.name }}">{{ abs.person.name }}</span>
+                {% endfor %}
+                {% for asgn in dayAssignments %}
+                    <span class="badge-assignment" title="{{ asgn.person.name }} – {{ asgn.task.name }}">{{ asgn.person.name }}</span>
+                {% endfor %}
+                {% for et in dayExtTasks %}
+                    <span class="badge-ext-task" title="{{ et.person.name }}{{ et.description ? ': ' ~ et.description : '' }}">{{ et.person.name }}</span>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="d-flex gap-3 small mb-4">
+        <span><span class="badge-absence d-inline">■</span> {{ 'nav.absences'|trans }}</span>
+        <span><span class="badge-assignment d-inline">■</span> {{ 'nav.planning'|trans }}</span>
+        <span><span class="badge-ext-task d-inline">■</span> {{ 'nav.external_tasks'|trans }}</span>
+    </div>
+
+</div>
+
+{{ include('public/_footer.html.twig') }}
+</body>
+</html>

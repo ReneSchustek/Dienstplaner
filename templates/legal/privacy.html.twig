@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'title.privacy'|trans }}{% endblock %}
+{% block page_title %}{{ 'title.privacy'|trans }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+
+        <div class="dp-card mb-4">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">1. Verantwortlicher</h2>
+            <p><strong>Ruhrcoder – Full Stack Development</strong><br>
+            René Schustek<br>
+            Somborner Höh 14<br>
+            43888 Dortmund<br>
+            E-Mail: <a href="mailto:info@ruhrcoder.de">info@ruhrcoder.de</a></p>
+        </div>
+
+        <div class="dp-card mb-4">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">2. Zweck der Datenverarbeitung</h2>
+            <p>Diese Anwendung dient der Planung und Verwaltung von Diensteinteilungen innerhalb einer geschlossenen Benutzergruppe (Versammlung). Sie ist nicht öffentlich zugänglich.</p>
+            <p style="margin-top: 12px;">Verarbeitete Kategorien personenbezogener Daten:</p>
+            <ul style="margin-top: 8px; padding-left: 20px; line-height: 1.8;">
+                <li><strong>Benutzerdaten:</strong> E-Mail-Adresse, gehashtes Passwort, Rolle im System</li>
+                <li><strong>Personenstammdaten:</strong> Name, optional E-Mail und Telefon</li>
+                <li><strong>Planungsdaten:</strong> Zuordnung von Personen zu Aufgaben an bestimmten Tagen</li>
+                <li><strong>Abwesenheitsdaten:</strong> Zeitraum und optionale Anmerkung</li>
+            </ul>
+        </div>
+
+        <div class="dp-card mb-4">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">3. Rechtsgrundlage (Art. 6 DSGVO)</h2>
+            <p>Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung / Durchführung vorvertraglicher Maßnahmen) sowie lit. f DSGVO (berechtigtes Interesse an der internen Dienstplanung).</p>
+        </div>
+
+        <div class="dp-card mb-4">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">4. Speicherdauer</h2>
+            <p>Personenbezogene Daten werden nur solange gespeichert, wie sie für den Zweck der Dienstplanung erforderlich sind. Nach Austritt aus der Versammlung oder auf Anfrage werden die Daten gelöscht.</p>
+        </div>
+
+        <div class="dp-card mb-4">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">5. Betroffenenrechte (Art. 15–21 DSGVO)</h2>
+            <p>Betroffene Personen haben folgende Rechte:</p>
+            <ul style="margin-top: 8px; padding-left: 20px; line-height: 1.8;">
+                <li><strong>Auskunft</strong> (Art. 15): Welche Daten gespeichert sind</li>
+                <li><strong>Berichtigung</strong> (Art. 16): Korrektur unrichtiger Daten</li>
+                <li><strong>Löschung</strong> (Art. 17): Entfernung der Daten</li>
+                <li><strong>Einschränkung</strong> (Art. 18): Einschränkung der Verarbeitung</li>
+                <li><strong>Widerspruch</strong> (Art. 21): Widerspruch gegen die Verarbeitung</li>
+            </ul>
+            <p style="margin-top: 12px;">Anfragen richten an: <a href="mailto:info@ruhrcoder.de">info@ruhrcoder.de</a></p>
+        </div>
+
+        <div class="dp-card mb-4">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">6. Datenweitergabe</h2>
+            <p>Eine Weitergabe personenbezogener Daten an Dritte findet nicht statt. Die Anwendung wird ausschließlich intern betrieben.</p>
+        </div>
+
+        <div class="dp-card">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">7. Beschwerderecht</h2>
+            <p>Sie haben das Recht, sich bei einer Datenschutzaufsichtsbehörde zu beschweren. Zuständig ist die Landesbeauftragte für Datenschutz und Informationsfreiheit Nordrhein-Westfalen (LDI NRW).</p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

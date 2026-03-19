@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Planung {{ month }}/{{ year }} – {{ assembly.name }}</title>
+    <style>
+        @page {
+            margin: 20mm 15mm;
+        }
+
+        body {
+            margin: 0;
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 10px;
+        }
+
+        h1 {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 3px 5px;
+            text-align: left;
+            word-wrap: break-word;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ assembly.name }} – Dienstplan {{ month }}/{{ year }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Abteilung</th>
+                <th>Aufgabe</th>
+                <th>Person</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dayId, row in grid %}
+                {% for taskId, assignment in row.assignments %}
+                <tr>
+                    <td>{{ row.day.date|date('d.m.Y') }}</td>
+                    <td>{{ assignment.task.department.name }}</td>
+                    <td>{{ assignment.task.name }}</td>
+                    <td>{{ assignment.person.name }}</td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

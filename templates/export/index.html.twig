@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'title.export'|trans }}{% endblock %}
+{% block page_title %}{{ 'title.export'|trans }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">{{ 'title.export'|trans }}</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">{{ 'export.select_month'|trans }}</h5>
+            <div class="row g-3 align-items-end">
+                <div class="col-auto">
+                    <label for="year" class="form-label">{{ 'label.year'|trans }}</label>
+                    <select id="year" class="form-select">
+                        {% for y in (year - 1)..(year + 1) %}
+                        <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label for="month" class="form-label">{{ 'label.month'|trans }}</label>
+                    <select id="month" class="form-select">
+                        {% for m in 1..12 %}
+                        <option value="{{ m }}" {% if m == month %}selected{% endif %}>{{ ('month.' ~ m)|trans }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="button" id="btn-show-pdf" class="btn btn-danger">{{ 'btn.show'|trans }} PDF</button>
+                    <button type="button" id="btn-show-excel" class="btn btn-success">{{ 'btn.download.excel'|trans }}</button>
+                    <button type="button" id="btn-show-word" class="btn btn-primary">{{ 'export.format.word'|trans }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+(function() {
+    var pdfBase = '{{ path('export_pdf', {year: 'YEAR', month: 'MONTH'}) }}';
+    var excelBase = '{{ path('export_excel', {year: 'YEAR', month: 'MONTH'}) }}';
+    var wordBase = '{{ path('export_word', {year: 'YEAR', month: 'MONTH'}) }}';
+
+    function buildUrl(base) {
+        var year = document.getElementById('year').value;
+        var month = document.getElementById('month').value;
+        return base.replace('YEAR', year).replace('MONTH', month);
+    }
+
+    document.getElementById('btn-show-pdf').addEventListener('click', function() {
+        window.open(buildUrl(pdfBase), '_blank');
+    });
+
+    document.getElementById('btn-show-excel').addEventListener('click', function() {
+        window.location.href = buildUrl(excelBase);
+    });
+
+    document.getElementById('btn-show-word').addEventListener('click', function() {
+        window.location.href = buildUrl(wordBase);
+    });
+})();
+</script>
+{% endblock %}

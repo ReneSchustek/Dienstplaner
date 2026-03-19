@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'search.overview.task_persons'|trans }}{% endblock %}
+{% block page_title %}{{ 'search.overview.task_persons'|trans }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-10">
+        {% include 'search/_nav.html.twig' with {active: 'overview_task_persons'} %}
+
+        <div class="dp-card mb-4">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-auto">
+                    <label for="dept" class="form-label">{{ 'table.department'|trans }}</label>
+                    <select id="dept" name="dept" class="form-select">
+                        <option value="">– {{ 'search.all'|trans }} –</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}"{{ deptId == dept.id ? ' selected' : '' }}>{{ dept.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-secondary">{{ 'btn.search'|trans }}</button>
+                    <a href="{{ path('search_overview_task_persons', {dept: deptId, format: 'csv'}) }}" class="btn btn-outline-success ms-1">CSV</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="dp-card">
+            {% if data is empty %}
+            <p class="text-muted">{{ 'search.no_results'|trans }}</p>
+            {% else %}
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>{{ 'table.department'|trans }}</th>
+                        <th>{{ 'nav.tasks'|trans }}</th>
+                        <th>{{ 'nav.persons'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    <tr>
+                        <td>{{ row.task.department.name }}</td>
+                        <td>{{ row.task.name }}</td>
+                        <td>
+                            {% if row.persons is empty %}
+                            <span class="text-muted">–</span>
+                            {% else %}
+                            {{ row.persons|map(p => p.name)|join(', ') }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

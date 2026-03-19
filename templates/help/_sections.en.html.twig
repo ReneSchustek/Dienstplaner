@@ -1,0 +1,176 @@
+<div id="dashboard" class="help-section">
+    <h2>Dashboard</h2>
+    <p>The start page after login. It shows the schedule for the current month at a glance.</p>
+    <ul>
+        <li>Use the arrow buttons at the top to switch months.</li>
+        <li>The table shows all planning days with the assigned persons per task.</li>
+        <li>Nothing can be edited on the dashboard – it is for viewing only.</li>
+        <li>The quick links in the centre take you directly to the most frequently used areas.</li>
+    </ul>
+</div>
+
+{% if is_granted('ROLE_PLANER') %}
+<div id="planung" class="help-section">
+    <h2>Planning</h2>
+    <p>This is where the schedule is created. The table shows all active planning days for the selected month.</p>
+    <ul>
+        <li><strong>Layout:</strong> Each row is a day, each column is a task within a department.</li>
+        <li><strong>Assign a person:</strong> Open the dropdown of a cell and select a person from the list.</li>
+        <li><strong>Remove an assignment:</strong> Choose the empty entry at the top of the dropdown.</li>
+        <li>A person can only be scheduled once per day – across all departments.</li>
+        <li>People who are absent or already have another task that day do not appear in the list.</li>
+        <li>Days blocked by a special date (e.g. public holiday, convention) show a note – nothing can be entered there.</li>
+        <li>The "Print" button in the top right prints the current plan directly from the browser.</li>
+        <li>Use the arrows at the top to switch months.</li>
+    </ul>
+</div>
+{% endif %}
+
+<div id="kalender" class="help-section">
+    <h2>Calendar</h2>
+    <p>The calendar shows all events in a monthly overview: assignments, other tasks, absences and special dates.</p>
+    <ul>
+        <li><strong>Assignments</strong> are shown in green; your own assignments are highlighted more brightly.</li>
+        <li><strong>Other tasks</strong> (external duties) appear in orange.</li>
+        <li><strong>Absences</strong> belonging to your person are shown in blue; absences of others in grey.</li>
+        <li><strong>Special dates</strong> (convention, memorial service etc.) appear in purple.</li>
+        <li><strong>Requirement:</strong> Your account must be linked to a person profile. Your administrator sets this up.</li>
+        <li>The personal calendar link (iCal) is available in the person profile – use it to connect your data to external calendar apps (e.g. Google Calendar).</li>
+    </ul>
+</div>
+
+{% if is_granted('ROLE_PLANER') %}
+<div id="abwesenheiten" class="help-section">
+    <h2>Absences</h2>
+    <p>Enter and manage absences here. Recorded absences block a person in planning for the relevant period.</p>
+    <ul>
+        <li><strong>New absence:</strong> Click "New" in the top right. Enter the person, from date, to date and an optional reason. For a single-day absence, entering only the from date is enough – the to date is filled in automatically.</li>
+        <li><strong>Edit / Delete:</strong> Click "Edit" in the row of the entry.</li>
+        <li>The list can be filtered by month using the month selector in the search bar.</li>
+        <li>Columns can be sorted by clicking the column heading.</li>
+        <li>The number of rows displayed per page can be configured in the assembly settings.</li>
+        <li><strong>TeamUp import:</strong> If a TeamUp calendar URL is stored in the assembly settings, the "TeamUp Import" button can be used. The system reads absences from the TeamUp calendar automatically and shows a preview for review before the entries are saved.</li>
+    </ul>
+</div>
+
+<div id="besondere-daten" class="help-section">
+    <h2>Special Dates</h2>
+    <p>Days when no regular service takes place – e.g. public holidays or conventions. These days are blocked in planning.</p>
+    <ul>
+        <li><strong>New entry:</strong> Click "New". Select the type (public holiday, convention, other), enter the from and to dates and optionally a name.</li>
+        <li>For a single-day event, the from and to dates must be the same.</li>
+        <li>Affected days appear with a note in the planning view – no assignment is possible there.</li>
+        <li>Multi-day entries (e.g. a multi-day convention) block all days in the range.</li>
+    </ul>
+</div>
+{% endif %}
+
+{% if is_granted('ROLE_ASSEMBLY_ADMIN') %}
+<div id="andere-aufgaben" class="help-section">
+    <h2>Other Tasks</h2>
+    <p>Assignments outside the regular schedule – for example convention duties, special tasks or external commitments. These entries appear as an additional note in the planning view on the relevant day.</p>
+    <ul>
+        <li><strong>New entry manually:</strong> Click "New". Select person, date and enter a description.</li>
+        <li><strong>PDF import:</strong> Click "Import" and upload a PDF file. The system reads names and dates from the file and tries to match names automatically to known persons in the assembly. A review window then opens directly over the list:
+            <ul>
+                <li>Each recognised row shows date, description and the suggested person.</li>
+                <li>The assignment can be corrected manually using the dropdown.</li>
+                <li>Rows without a match can be assigned manually or deselected using the checkbox.</li>
+                <li>Click "Confirm import" to save all selected entries.</li>
+            </ul>
+        </li>
+        <li>The list can be filtered by month and sorted by person or date.</li>
+    </ul>
+</div>
+
+<div id="personen" class="help-section">
+    <h2>People</h2>
+    <p>List of all persons in the assembly. Tasks that a person can be scheduled for are also assigned here.</p>
+    <ul>
+        <li><strong>New person:</strong> Click "New" and enter the name. Names must be unique – the system detects similar names (e.g. "Smith John" and "John Smith") and prevents duplicate entries.</li>
+        <li><strong>Assign tasks:</strong> In the edit form under "Assigned Tasks", tick the boxes for the relevant tasks. Only these tasks will appear for the person in the planning dropdown.</li>
+        <li>A person with no assigned tasks does not appear anywhere in planning.</li>
+        <li><strong>Link user account:</strong> In the edit form, a person can be connected to a user account. This is required for the user to see their own calendar.</li>
+        <li><strong>Calendar link:</strong> Using "Generate calendar token" in the edit form, the linked person gets a personal iCal link for external calendar apps.</li>
+        <li>The list can be searched and sorted by name or email.</li>
+    </ul>
+</div>
+
+<div id="abteilungen" class="help-section">
+    <h2>Departments</h2>
+    <p>Departments group several tasks into one block. In the planning view, each department appears as its own section with a heading.</p>
+    <ul>
+        <li><strong>New department:</strong> Click "New" and give it a name. Optionally choose a colour that is shown as the background colour in planning.</li>
+        <li>Every task must belong to a department – tasks cannot be created without one.</li>
+        <li>A department can only be deleted if no tasks are assigned to it any more.</li>
+    </ul>
+</div>
+
+<div id="aufgaben" class="help-section">
+    <h2>Tasks</h2>
+    <p>Individual duties or roles within a department – for example "Audio / Zoom", "Entrance door" or "Hall duty".</p>
+    <ul>
+        <li><strong>New task:</strong> Click "New", enter a name and select the department.</li>
+        <li>Only people who have this task assigned in their person profile can be selected in planning for this task.</li>
+        <li>The order of tasks in the list matches the order of columns in the planning table.</li>
+        <li>A task can only be deleted if no planning entries are assigned to it any more.</li>
+    </ul>
+</div>
+
+<div id="suche" class="help-section">
+    <h2>Search &amp; Overviews</h2>
+    <p>This area provides various evaluations and search tools. The navigation at the top of the area switches between views.</p>
+    <ul>
+        <li><strong>Person search:</strong> Search for a person by name. The detail view shows all assignments and absences for that person, optionally filtered by date range.</li>
+        <li><strong>Task search:</strong> Search for a task, optionally filtered by department. The detail view shows all persons who can be scheduled for this task and how often each person has been assigned.</li>
+        <li><strong>Availability:</strong> Enter a date – the view shows all persons available on that day (not absent, not already scheduled). Optionally restrict by task.</li>
+        <li><strong>Overview: Tasks → People:</strong> All tasks with their assigned persons. Exportable as CSV.</li>
+        <li><strong>Overview: People → Tasks:</strong> All persons with their assigned tasks. Exportable as CSV.</li>
+        <li><strong>Planning history:</strong> All assignments in a period. Filterable by person, task and department. Exportable as CSV.</li>
+        <li><strong>Absences:</strong> All absences in a period. Exportable as CSV.</li>
+        <li><strong>Task statistics:</strong> Assignment counts per person and department in a period. Exportable as CSV.</li>
+        <li><strong>Fairness &amp; Rotation:</strong> Matrix of all persons and tasks with assignment counts. Cells are colour-coded: green = average, yellow = below average, red = significantly above average. Filterable by year and month. Exportable as CSV.</li>
+    </ul>
+</div>
+
+<div id="export" class="help-section">
+    <h2>Export</h2>
+    <p>Download the finished schedule as a file.</p>
+    <ul>
+        <li>Select month and year at the top, then click the desired format.</li>
+        <li><strong>PDF</strong> – ready-formatted, suitable for printing or display.</li>
+        <li><strong>Excel (.xlsx)</strong> – tabular, editable in Excel or LibreOffice Calc.</li>
+        <li><strong>Word (.docx)</strong> – editable in Word or LibreOffice Writer.</li>
+        <li>Alternative: the planning page has a "Print" button – use it to print the plan directly from the browser without downloading a file.</li>
+    </ul>
+</div>
+
+<div id="benutzerverwaltung" class="help-section">
+    <h2>User Management</h2>
+    <p>Create and manage user accounts for the assembly.</p>
+    <ul>
+        <li><strong>New user:</strong> Click "New". Enter email address and role. The system automatically sends a one-time password by email. The password must be changed on the first login.</li>
+        <li><strong>Roles:</strong>
+            <ul>
+                <li><strong>Assembly Admin</strong> – Full access to all assembly data, user management and settings.</li>
+                <li><strong>Planner</strong> – Can edit the schedule and manage absences and special dates. No access to user management.</li>
+                <li><strong>User</strong> – Read-only access. Can see their own calendar if a person profile is linked.</li>
+            </ul>
+        </li>
+        <li><strong>Reset password:</strong> Sends a new one-time password to the stored email address. The user must change it on the next login.</li>
+        <li><strong>Link person:</strong> Via "Edit person", a user account can be connected to a person profile. This is required for the user to see their calendar.</li>
+        <li><strong>Delete user:</strong> The account and session are deleted. Planning entries and absences are retained.</li>
+    </ul>
+</div>
+{% endif %}
+
+<div id="profil" class="help-section">
+    <h2>Profile &amp; Account</h2>
+    <p>Manage your own account details. Accessible via your username in the top right or the sidebar.</p>
+    <ul>
+        <li><strong>Name and email:</strong> Can be changed at any time.</li>
+        <li><strong>Change password:</strong> Enter your current password, then the new password (twice to confirm).</li>
+        <li><strong>Two-factor authentication (2FA):</strong> Activate 2FA for extra security at login. You need an authenticator app (e.g. Google Authenticator, Aegis). Scan the QR code in the app and enter the generated 6-digit code. From then on, this code is required at every login.</li>
+        <li><strong>Delete account:</strong> In the "Danger zone" section at the bottom. This action cannot be undone. Your absences and planning entries are retained; the account and login are removed.</li>
+    </ul>
+</div>

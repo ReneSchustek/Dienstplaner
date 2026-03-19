@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}" data-theme="{{ app.user ? app.user.theme : 'modern-classic' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dienstplaner{% endblock %} – Dienstplaner</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300..700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/themes.css" rel="stylesheet">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+
+{% if app.user %}
+{# === Sidebar === #}
+<aside class="sidebar" id="sidebar" aria-label="Hauptnavigation">
+    <div class="sidebar-brand">
+        <img src="/images/logo.webp" alt="Dienstplaner Logo" width="28" height="28" class="sidebar-logo">
+        <span class="sidebar-brand-text">Dienstplaner</span>
+        <button class="btn-sidebar-toggle btn-sidebar-brand-toggle" id="sidebar-toggle" aria-label="Sidebar ein-/ausblenden" aria-expanded="true" aria-controls="sidebar">
+            <svg id="icon-collapse" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+            <svg id="icon-expand" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display:none"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav" role="navigation">
+        <a href="{{ path('dashboard') }}" class="{{ app.request.attributes.get('_route') == 'dashboard' ? 'active' : '' }}" title="{{ 'nav.dashboard'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span class="nav-label">{{ 'nav.dashboard'|trans }}</span>
+        </a>
+        <a href="{{ path('planning_index') }}" class="{{ app.request.attributes.get('_route') starts with 'planning' ? 'active' : '' }}" title="{{ 'nav.planning'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="nav-label">{{ 'nav.planning'|trans }}</span>
+        </a>
+        <a href="{{ path('calendar_index') }}" class="{{ app.request.attributes.get('_route') starts with 'calendar' ? 'active' : '' }}" title="{{ 'nav.calendar'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="nav-label">{{ 'nav.calendar'|trans }}</span>
+        </a>
+
+        {% if is_granted('ROLE_PLANER') %}
+        {% set mgmtActive = app.request.attributes.get('_route') starts with 'absence'
+            or app.request.attributes.get('_route') starts with 'external_task'
+            or app.request.attributes.get('_route') starts with 'person'
+            or app.request.attributes.get('_route') starts with 'department'
+            or app.request.attributes.get('_route') starts with 'task'
+            or app.request.attributes.get('_route') starts with 'search'
+            or app.request.attributes.get('_route') starts with 'export' %}
+        <button class="sidebar-section sidebar-section-toggle" data-section="management" aria-expanded="true">
+            <span class="nav-label">{{ 'nav.section.management'|trans }}</span>
+            <svg class="section-chevron nav-label" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="sidebar-section-group" id="sidebar-section-management">
+        <a href="{{ path('absence_index') }}" class="{{ app.request.attributes.get('_route') starts with 'absence' ? 'active' : '' }}" title="{{ 'nav.absences'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            <span class="nav-label">{{ 'nav.absences'|trans }}</span>
+        </a>
+        <a href="{{ path('external_task_index') }}" class="{{ app.request.attributes.get('_route') starts with 'external_task' ? 'active' : '' }}" title="{{ 'nav.external_tasks'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span class="nav-label">{{ 'nav.external_tasks'|trans }}</span>
+        </a>
+        <a href="{{ path('person_index') }}" class="{{ app.request.attributes.get('_route') starts with 'person' ? 'active' : '' }}" title="{{ 'nav.persons'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span class="nav-label">{{ 'nav.persons'|trans }}</span>
+        </a>
+        <a href="{{ path('department_index') }}" class="{{ app.request.attributes.get('_route') starts with 'department' ? 'active' : '' }}" title="{{ 'nav.departments'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            <span class="nav-label">{{ 'nav.departments'|trans }}</span>
+        </a>
+        <a href="{{ path('task_index') }}" class="{{ app.request.attributes.get('_route') starts with 'task' ? 'active' : '' }}" title="{{ 'nav.tasks'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <span class="nav-label">{{ 'nav.tasks'|trans }}</span>
+        </a>
+        <a href="{{ path('search_index') }}" class="{{ app.request.attributes.get('_route') starts with 'search' ? 'active' : '' }}" title="{{ 'nav.search'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span class="nav-label">{{ 'nav.search'|trans }}</span>
+        </a>
+        <a href="{{ path('export_index') }}" class="{{ app.request.attributes.get('_route') starts with 'export' ? 'active' : '' }}" title="{{ 'nav.export'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span class="nav-label">{{ 'nav.export'|trans }}</span>
+        </a>
+        </div>
+        {% endif %}
+
+        {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}
+        {% set adminMgmtActive = app.request.attributes.get('_route') starts with 'special_date'
+            or app.request.attributes.get('_route') starts with 'assembly_token'
+            or app.request.attributes.get('_route') starts with 'admin_user' %}
+        <button class="sidebar-section sidebar-section-toggle" data-section="administration" aria-expanded="true">
+            <span class="nav-label">{{ 'nav.section.administration'|trans }}</span>
+            <svg class="section-chevron nav-label" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="sidebar-section-group" id="sidebar-section-administration">
+        <a href="{{ path('special_date_index') }}" class="{{ app.request.attributes.get('_route') starts with 'special_date' ? 'active' : '' }}" title="{{ 'nav.special_dates'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+            <span class="nav-label">{{ 'nav.special_dates'|trans }}</span>
+        </a>
+        <a href="{{ path('assembly_token_manage') }}" class="{{ app.request.attributes.get('_route') starts with 'assembly_token' ? 'active' : '' }}" title="{{ 'nav.assembly_tokens'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span class="nav-label">{{ 'nav.assembly_tokens'|trans }}</span>
+        </a>
+        <a href="{{ path('admin_user_index') }}" class="{{ app.request.attributes.get('_route') starts with 'admin_user' ? 'active' : '' }}" title="{{ 'nav.users'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <span class="nav-label">{{ 'nav.users'|trans }}</span>
+        </a>
+        </div>
+        {% endif %}
+
+        {% if is_granted('ROLE_ADMIN') %}
+        <button class="sidebar-section sidebar-section-toggle" data-section="assemblies" aria-expanded="true">
+            <span class="nav-label">{{ 'nav.assemblies'|trans }}</span>
+            <svg class="section-chevron nav-label" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="sidebar-section-group" id="sidebar-section-assemblies">
+        <a href="{{ path('assembly_index') }}" class="{{ app.request.attributes.get('_route') starts with 'assembly' ? 'active' : '' }}" title="{{ 'nav.assemblies'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="nav-label">{{ 'nav.assemblies'|trans }}</span>
+        </a>
+        <a href="{{ path('admin_logs') }}" class="{{ app.request.attributes.get('_route') == 'admin_logs' ? 'active' : '' }}" title="Logs">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+            <span class="nav-label">Logs</span>
+        </a>
+        </div>
+        {% endif %}
+
+        {% set sysActive = app.request.attributes.get('_route') starts with 'profile'
+            or app.request.attributes.get('_route') starts with 'help'
+            or app.request.attributes.get('_route') starts with 'legal' %}
+        <button class="sidebar-section sidebar-section-toggle" data-section="system" aria-expanded="{{ sysActive ? 'true' : 'false' }}">
+            <span class="nav-label">{{ 'nav.section.system'|trans }}</span>
+            <svg class="section-chevron nav-label" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="sidebar-section-group{{ sysActive ? '' : ' closed' }}" id="sidebar-section-system">
+        <a href="{{ path('profile_index') }}" class="{{ app.request.attributes.get('_route') == 'profile_index' or app.request.attributes.get('_route') starts with 'profile_update' or app.request.attributes.get('_route') starts with 'profile_change' ? 'active' : '' }}" title="{{ 'nav.profile'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <span class="nav-label">{{ 'nav.profile'|trans }}</span>
+        </a>
+        <a href="{{ path('help_index') }}" title="{{ 'nav.help'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span class="nav-label">{{ 'nav.help'|trans }}</span>
+        </a>
+        <a href="{{ path('legal_index') }}" title="{{ 'nav.legal'|trans }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span class="nav-label">{{ 'nav.legal'|trans }}</span>
+        </a>
+        </div>
+    </nav>
+</aside>
+
+<div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+{# === Main Wrapper === #}
+<div class="main-wrapper" id="main-wrapper">
+
+    {# === Topbar === #}
+    <header class="topbar" role="banner">
+        <div class="topbar-left">
+            <button class="btn-sidebar-toggle sidebar-mobile-open-btn" id="sidebar-toggle-mobile" aria-label="Menü öffnen">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <span class="topbar-title">{% block page_title %}{% endblock %}</span>
+        </div>
+        <div class="topbar-right">
+            <span class="topbar-user" aria-label="Angemeldet als {{ app.user.email }}">{{ app.user.getDisplayName() }}</span>
+            <a href="{{ path('security_logout') }}" class="btn btn-outline-secondary btn-sm" aria-label="{{ 'nav.logout'|trans }}">{{ 'nav.logout'|trans }}</a>
+        </div>
+    </header>
+
+    {# === Flash Messages === #}
+    <div class="flash-container" role="status" aria-live="polite">
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type == 'success' ? 'success' : (type == 'error' ? 'danger' : 'info') }} alert-dismissible fade show shadow-sm" role="alert">
+                    {{ message|trans }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Schließen"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    {# === Page Content === #}
+    <main class="page-content" id="main-content" role="main">
+{% else %}
+{# Login-Layout ohne Sidebar #}
+<div class="w-100">
+{% endif %}
+
+{% block content %}{% endblock %}
+
+{% if app.user %}
+    </main>
+
+    {# === Statusbar === #}
+    <footer class="statusbar" role="contentinfo">
+        <span>Dienstplaner{% if app.user.assembly %} · {{ app.user.assembly.name }}{% endif %}</span>
+        <span class="d-flex align-items-center gap-3">
+
+            {# Versammlungswechsel (nur ROLE_ADMIN) #}
+            {% if is_granted('ROLE_ADMIN') %}
+            {% set assemblies = all_assemblies() %}
+            {% set activeAssemblyId = active_assembly_id(app.user) %}
+            {% set ownAssemblyId = app.user.assembly ? app.user.assembly.id : null %}
+            <div class="dropup">
+                <button type="button" class="statusbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="{{ 'admin.assembly.switch'|trans }}" style="background:none;border:none;padding:0;cursor:pointer;color:inherit;display:inline-flex;align-items:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" style="min-width: 160px; font-size: 0.8rem;">
+                    <li><span class="dropdown-item-text text-muted" style="font-size:0.7rem;">{{ 'admin.assembly.switch'|trans }}</span></li>
+                    {% for assembly in assemblies %}
+                    <li>
+                        <form method="post" action="{{ path('admin_assembly_switch', {id: assembly.id}) }}" style="margin:0">
+                            <input type="hidden" name="_token" value="{{ csrf_token('assembly-switch') }}">
+                            <button type="submit" class="dropdown-item{{ assembly.id == activeAssemblyId ? ' active' : '' }}">
+                                {{ assembly.name }}
+                            </button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                    {% if activeAssemblyId != ownAssemblyId %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form method="post" action="{{ path('admin_assembly_reset') }}" style="margin:0">
+                            <input type="hidden" name="_token" value="{{ csrf_token('assembly-switch') }}">
+                            <button type="submit" class="dropdown-item text-muted" style="font-size: 0.8rem;">
+                                ↩ {{ 'admin.assembly.reset'|trans }}
+                            </button>
+                        </form>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {# Theme-Auswahl #}
+            <form method="post" action="{{ path('profile_theme') }}" id="footer-theme-form" style="margin:0">
+                <input type="hidden" name="_token" value="{{ csrf_token('profile-theme') }}">
+                <div class="dropup">
+                    <button type="button" class="statusbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="{{ 'label.theme'|trans }}" style="background:none;border:none;padding:0;cursor:pointer;color:inherit;display:inline-flex;align-items:center;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8a4 4 0 0 1 0 8"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 150px; font-size: 0.8rem;">
+                        <li><span class="dropdown-item-text text-muted" style="font-size:0.7rem;">{{ 'label.theme'|trans }}</span></li>
+                        <li>
+                            <button type="submit" name="theme" value="modern-classic" class="dropdown-item{{ app.user.theme == 'modern-classic' ? ' active' : '' }}">
+                                ModernClassic
+                            </button>
+                        </li>
+                        <li>
+                            <button type="submit" name="theme" value="midnight-library" class="dropdown-item{{ app.user.theme == 'midnight-library' ? ' active' : '' }}">
+                                MidnightLibrary
+                            </button>
+                        </li>
+                        <li>
+                            <button type="submit" name="theme" value="paper-coffee" class="dropdown-item{{ app.user.theme == 'paper-coffee' ? ' active' : '' }}">
+                                PaperCoffee
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+
+            {# Kontext-Hilfe #}
+            <a href="#" class="help-open-btn"
+               data-route="{{ app.request.attributes.get('_route') }}"
+               data-help-url="{{ path('help_index') }}?popup=1"
+               style="color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                {{ 'nav.help'|trans }}
+            </a>
+            &nbsp;·&nbsp;
+
+            {# Links #}
+            <a href="{{ path('legal_index') }}" style="color: inherit; text-decoration: none;">{{ 'nav.legal'|trans }}</a>
+            &nbsp;·&nbsp;
+            <a href="{{ path('legal_privacy') }}" style="color: inherit; text-decoration: none;">{{ 'nav.privacy'|trans }}</a>
+
+            {# Sprachauswahl #}
+            <div class="dropup">
+                <button type="button" class="statusbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="{{ 'label.language'|trans }}" style="background:none;border:none;padding:0;cursor:pointer;color:inherit;">
+                    {% if app.request.locale == 'de' %}<img src="https://flagcdn.com/20x15/de.png" width="20" height="15" alt="Deutsch">
+                    {% elseif app.request.locale == 'en' %}<img src="https://flagcdn.com/20x15/gb.png" width="20" height="15" alt="English">
+                    {% elseif app.request.locale == 'fr' %}<img src="https://flagcdn.com/20x15/fr.png" width="20" height="15" alt="Français">
+                    {% else %}<img src="https://flagcdn.com/20x15/de.png" width="20" height="15" alt="DE">
+                    {% endif %}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" style="min-width: 130px; font-size: 0.8rem;">
+                    <li>
+                        <a href="{{ path('language_switch', {locale: 'de'}) }}" class="dropdown-item{{ app.request.locale == 'de' ? ' active' : '' }}">
+                            <img src="https://flagcdn.com/20x15/de.png" width="20" height="15" alt="" class="me-1"> Deutsch
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('language_switch', {locale: 'en'}) }}" class="dropdown-item{{ app.request.locale == 'en' ? ' active' : '' }}">
+                            <img src="https://flagcdn.com/20x15/gb.png" width="20" height="15" alt="" class="me-1"> English
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('language_switch', {locale: 'fr'}) }}" class="dropdown-item{{ app.request.locale == 'fr' ? ' active' : '' }}">
+                            <img src="https://flagcdn.com/20x15/fr.png" width="20" height="15" alt="" class="me-1"> Français
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </span>
+    </footer>
+
+</div><!-- /.main-wrapper -->
+{% else %}
+</div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    (function () {
+        const sidebar = document.getElementById('sidebar');
+        const wrapper = document.getElementById('main-wrapper');
+        const toggle = document.getElementById('sidebar-toggle');
+        const mobileToggle = document.getElementById('sidebar-toggle-mobile');
+        const overlay = document.getElementById('sidebar-overlay');
+        const iconCollapse = document.getElementById('icon-collapse');
+        const iconExpand = document.getElementById('icon-expand');
+        if (!sidebar || !toggle) return;
+
+        const isMobile = () => window.innerWidth < 768;
+
+        function applyCollapsedState(collapsed) {
+            sidebar.classList.toggle('collapsed', collapsed);
+            wrapper.classList.toggle('sidebar-collapsed', collapsed);
+            toggle.setAttribute('aria-expanded', String(!collapsed));
+            if (iconCollapse) iconCollapse.style.display = collapsed ? 'none' : '';
+            if (iconExpand) iconExpand.style.display = collapsed ? '' : 'none';
+        }
+
+        function openMobileSidebar() {
+            sidebar.classList.add('mobile-open');
+            if (overlay) { overlay.classList.add('active'); overlay.removeAttribute('aria-hidden'); }
+        }
+
+        function closeMobileSidebar() {
+            sidebar.classList.remove('mobile-open');
+            if (overlay) { overlay.classList.remove('active'); overlay.setAttribute('aria-hidden', 'true'); }
+        }
+
+        // Desktop: restore saved state
+        if (!isMobile()) {
+            const collapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+            applyCollapsedState(collapsed);
+        }
+
+        function handleSidebarToggle(forceOpen) {
+            if (isMobile()) {
+                if (forceOpen || !sidebar.classList.contains('mobile-open')) {
+                    openMobileSidebar();
+                } else {
+                    closeMobileSidebar();
+                }
+            } else {
+                const isCollapsed = !sidebar.classList.contains('collapsed');
+                applyCollapsedState(isCollapsed);
+                localStorage.setItem('sidebar-collapsed', String(isCollapsed));
+            }
+        }
+
+        toggle.addEventListener('click', function () { handleSidebarToggle(false); });
+        if (mobileToggle) mobileToggle.addEventListener('click', function () { handleSidebarToggle(true); });
+
+        if (overlay) {
+            overlay.addEventListener('click', closeMobileSidebar);
+        }
+
+        // Einklappbare Sidebar-Gruppen
+        document.querySelectorAll('.sidebar-section-toggle').forEach(function (btn) {
+            var sectionId = btn.dataset.section;
+            var group = document.getElementById('sidebar-section-' + sectionId);
+            if (!group) return;
+
+            // Gespeicherten Zustand aus localStorage laden
+            var stored = localStorage.getItem('sidebar-section-' + sectionId);
+            if (stored === 'closed' && btn.getAttribute('aria-expanded') !== 'true') {
+                group.classList.add('closed');
+                btn.setAttribute('aria-expanded', 'false');
+            } else if (stored === 'open') {
+                group.classList.remove('closed');
+                btn.setAttribute('aria-expanded', 'true');
+            }
+
+            btn.addEventListener('click', function () {
+                // Nicht im collapsed-Modus der Sidebar (Icons-only)
+                if (sidebar && sidebar.classList.contains('collapsed')) return;
+                var isOpen = !group.classList.contains('closed');
+                group.classList.toggle('closed', isOpen);
+                btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+                localStorage.setItem('sidebar-section-' + sectionId, isOpen ? 'closed' : 'open');
+            });
+        });
+
+        // Auto-dismiss flash messages
+        setTimeout(() => {
+            document.querySelectorAll('.flash-container .alert').forEach(el => {
+                const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+                bsAlert.close();
+            });
+        }, 4000);
+
+        // Color badges
+        document.querySelectorAll('[data-dept-color]').forEach(function (el) {
+            const hex = el.dataset.deptColor;
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+            el.style.backgroundColor = hex;
+            el.style.color = yiq >= 128 ? '#000' : '#fff';
+        });
+    })();
+</script>
+{% block javascripts %}{% endblock %}
+
+{# ── Hilfe-Modal ─────────────────────────────────────────────────────────── #}
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    {{ 'title.help'|trans }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'help.close'|trans }}"></button>
+            </div>
+            <div class="modal-body" id="helpModalBody" style="min-height: 200px;">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Laden…</span></div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" id="helpShowAll" class="btn btn-sm btn-outline-secondary" style="display:none;">{{ 'help.show_all'|trans }}</button>
+                <div class="d-flex gap-2">
+                    <a href="{{ path('help_index') }}" target="_blank" class="btn btn-sm btn-outline-secondary">{{ 'help.full_page'|trans }}</a>
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal">{{ 'help.close'|trans }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+#helpModalBody .help-section { background:#fff; border:1px solid #e0e0e0; border-radius:6px; padding:16px 20px; margin-bottom:12px; }
+#helpModalBody .help-section h2 { font-size:0.95rem; font-weight:600; color:#1a56db; margin-bottom:8px; padding-bottom:5px; border-bottom:2px solid #1a56db; }
+#helpModalBody .help-section ul { padding-left:18px; margin:0; line-height:1.85; }
+#helpModalBody .help-section ul ul { padding-left:16px; margin-top:4px; }
+#helpModalBody .help-section p { margin-bottom:8px; color:#555; font-size:0.875rem; }
+[data-theme="dark-mode"] #helpModalBody .help-section,
+[data-theme="midnight-library"] #helpModalBody .help-section { background:#1e1e2e; border-color:#444; }
+[data-theme="dark-mode"] #helpModalBody .help-section p,
+[data-theme="midnight-library"] #helpModalBody .help-section p { color:#aaa; }
+</style>
+
+<script>
+(function () {
+    var routeMap = {
+        'dashboard':     'dashboard',
+        'planning':      'planung',
+        'calendar':      'kalender',
+        'absence':       'abwesenheiten',
+        'special_date':  'besondere-daten',
+        'external_task': 'andere-aufgaben',
+        'person':        'personen',
+        'department':    'abteilungen',
+        'task':          'aufgaben',
+        'search':        'suche',
+        'export':        'export',
+        'admin_user':    'benutzerverwaltung',
+        'profile':       'profil',
+    };
+
+    function getSectionId(route) {
+        if (!route) return null;
+        for (var key in routeMap) {
+            if (route.indexOf(key) === 0) return routeMap[key];
+        }
+        return null;
+    }
+
+    var modal      = null;
+    var modalBody  = document.getElementById('helpModalBody');
+    var showAllBtn = document.getElementById('helpShowAll');
+    var cachedDoc  = null;
+
+    function getModal() {
+        if (!modal) modal = new bootstrap.Modal(document.getElementById('helpModal'));
+        return modal;
+    }
+
+    function renderSection(sectionId) {
+        var target = sectionId ? cachedDoc.getElementById(sectionId) : null;
+        var allSections = Array.from(cachedDoc.querySelectorAll('.help-section'));
+
+        if (target) {
+            modalBody.innerHTML = target.outerHTML;
+            showAllBtn.style.display = '';
+            showAllBtn.onclick = function () {
+                var html = '';
+                allSections.forEach(function (s) { html += s.outerHTML; });
+                modalBody.innerHTML = html;
+                showAllBtn.style.display = 'none';
+            };
+        } else {
+            var html = '';
+            allSections.forEach(function (s) { html += s.outerHTML; });
+            modalBody.innerHTML = html;
+            showAllBtn.style.display = 'none';
+        }
+    }
+
+    function openHelp(sectionId) {
+        getModal().show();
+        if (cachedDoc) {
+            renderSection(sectionId);
+            return;
+        }
+        modalBody.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Laden…</span></div></div>';
+        var btn = document.querySelector('.help-open-btn');
+        var url = (btn ? btn.dataset.helpUrl : null) || '/help?popup=1';
+        fetch(url, { credentials: 'same-origin' })
+            .then(function (r) { return r.text(); })
+            .then(function (html) {
+                cachedDoc = new DOMParser().parseFromString(html, 'text/html');
+                renderSection(sectionId);
+            })
+            .catch(function () {
+                modalBody.innerHTML = '<p class="text-danger p-3">Hilfe konnte nicht geladen werden.</p>';
+            });
+    }
+
+    document.querySelectorAll('.help-open-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            openHelp(getSectionId(btn.dataset.route || ''));
+        });
+    });
+})();
+</script>
+
+{# ── Force-Password-Change-Modal ─────────────────────────────────────────── #}
+{% if app.user is not null and app.user.forcePasswordChange %}
+<div class="modal fade" id="forcePasswordModal" tabindex="-1"
+     data-bs-backdrop="static" data-bs-keyboard="false"
+     aria-labelledby="forcePasswordModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forcePasswordModalLabel">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    {{ 'modal.force_password.title'|trans }}
+                </h5>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-3" style="font-size: 0.875rem;">
+                    {{ 'modal.force_password.intro'|trans }}
+                </p>
+                <form method="post" action="{{ path('profile_change_password') }}" novalidate>
+                    <input type="hidden" name="_token" value="{{ csrf_token('profile-change-password') }}">
+                    <div class="mb-3">
+                        <label for="fpc_current" class="form-label">{{ 'profile.current_password'|trans }}</label>
+                        <input type="password" id="fpc_current" name="current_password"
+                               class="form-control" autocomplete="current-password" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fpc_new" class="form-label">{{ 'label.new_password'|trans }}</label>
+                        <input type="password" id="fpc_new" name="new_password"
+                               class="form-control" autocomplete="new-password" required minlength="8">
+                    </div>
+                    <div class="mb-3">
+                        <label for="fpc_confirm" class="form-label">{{ 'label.password_confirm'|trans }}</label>
+                        <input type="password" id="fpc_confirm" name="confirm_password"
+                               class="form-control" autocomplete="new-password" required>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center pt-1">
+                        <a href="{{ path('security_logout') }}" class="btn btn-outline-secondary btn-sm">
+                            {{ 'nav.logout'|trans }}
+                        </a>
+                        <button type="submit" class="btn btn-primary">{{ 'btn.save'|trans }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(function () {
+    var el = document.getElementById('forcePasswordModal');
+    if (el && typeof bootstrap !== 'undefined') {
+        new bootstrap.Modal(el).show();
+    }
+}());
+</script>
+{% endif %}
+
+</body>
+</html>

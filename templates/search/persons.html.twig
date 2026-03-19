@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'search.persons.title'|trans }}{% endblock %}
+{% block page_title %}{{ 'search.persons.title'|trans }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-10">
+        {% include 'search/_nav.html.twig' with {active: 'persons'} %}
+
+        <div class="dp-card mb-4">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-auto flex-grow-1">
+                    <label for="q" class="form-label">{{ 'search.persons.label'|trans }}</label>
+                    <input type="text" id="q" name="q" value="{{ query }}" class="form-control" placeholder="{{ 'search.persons.placeholder'|trans }}" autofocus>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">{{ 'btn.search'|trans }}</button>
+                </div>
+            </form>
+        </div>
+
+        {% if query != '' %}
+        <div class="dp-card">
+            {% if persons is empty %}
+            <p class="text-muted">{{ 'search.no_results'|trans }}</p>
+            {% else %}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{{ 'table.name'|trans }}</th>
+                        <th>{{ 'table.department'|trans }}</th>
+                        <th>{{ 'table.email'|trans }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for person in persons %}
+                    <tr>
+                        <td>{{ person.name }}</td>
+                        <td>{{ person.assembly.name }}</td>
+                        <td>{{ person.email }}</td>
+                        <td>
+                            <a href="{{ path('search_person_detail', {id: person.id}) }}" class="btn btn-sm btn-outline-secondary">{{ 'btn.details'|trans }}</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

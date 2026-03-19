@@ -1,0 +1,213 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'title.calendar'|trans }}{% endblock %}
+{% block page_title %}{{ 'title.calendar'|trans }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+    <style>
+        #calendar { max-width: 1200px; }
+        .fc-event { cursor: pointer; }
+        .fc-event.own-event {
+            cursor: pointer;
+            font-weight: 700;
+            border-width: 2px;
+            margin-bottom: 1px;
+        }
+        .fc-event.other-event { cursor: default; }
+        .fc-event-title { white-space: pre-line; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ 'title.calendar'|trans }}</h1>
+        {% if app.user.person %}
+            <button class="btn btn-primary" id="btn-new-absence">{{ 'btn.add_absence'|trans }}</button>
+        {% else %}
+            <span class="text-muted small">{{ 'calendar.no_person'|trans }}</span>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div id="calendar"></div>
+        </div>
+    </div>
+</div>
+
+{# Absence Modal #}
+<div class="modal fade" id="absenceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="absenceModalTitle">{{ 'calendar.modal.new'|trans }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-error" class="alert alert-danger d-none"></div>
+                <input type="hidden" id="absence-id">
+                <div class="mb-3">
+                    <label class="form-label">{{ 'label.start_date'|trans }}</label>
+                    <input type="date" class="form-control" id="absence-start">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ 'label.end_date'|trans }}</label>
+                    <input type="date" class="form-control" id="absence-end">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ 'label.note'|trans }}</label>
+                    <textarea class="form-control" id="absence-note" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger d-none" id="btn-delete-absence">{{ 'btn.delete'|trans }}</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'btn.cancel'|trans }}</button>
+                <button type="button" class="btn btn-primary" id="btn-save-absence">{{ 'btn.save'|trans }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    <script>
+        const csrfToken = '{{ csrf_token('calendar') }}';
+        const hasPersonProfile = {{ app.user.person ? 'true' : 'false' }};
+        const eventsUrl = '{{ path('calendar_events') }}';
+        const createUrl = '{{ path('calendar_absence_create') }}';
+        const labelNew = '{{ 'calendar.modal.new'|trans }}';
+        const labelEdit = '{{ 'calendar.modal.edit'|trans }}';
+        const confirmDelete = '{{ 'calendar.confirm.delete'|trans }}';
+        const errorSave = '{{ 'calendar.error.save'|trans }}';
+
+        const modal = new bootstrap.Modal(document.getElementById('absenceModal'));
+        let calendar;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: '{{ app.request.locale }}',
+                height: 'auto',
+                firstDay: 1,
+                eventOrder: 'order,title',
+                events: function (fetchInfo, successCallback, failureCallback) {
+                    fetch(eventsUrl + '?start=' + fetchInfo.startStr + '&end=' + fetchInfo.endStr)
+                        .then(r => r.json())
+                        .then(successCallback)
+                        .catch(failureCallback);
+                },
+                eventClick: function (info) {
+                    if (!info.event.extendedProps.isOwn) {
+                        return;
+                    }
+                    openEditModal(info.event);
+                },
+                eventDidMount: function (info) {
+                    const isOwn = info.event.extendedProps.isOwn;
+                    info.el.classList.add(isOwn ? 'own-event' : 'other-event');
+                    if (info.event.extendedProps.note) {
+                        info.el.title = info.event.extendedProps.note;
+                    }
+                },
+            });
+
+            calendar.render();
+
+            document.getElementById('btn-new-absence')?.addEventListener('click', openCreateModal);
+            document.getElementById('btn-save-absence').addEventListener('click', saveAbsence);
+            document.getElementById('btn-delete-absence').addEventListener('click', deleteAbsence);
+        });
+
+        function openCreateModal() {
+            document.getElementById('absenceModalTitle').textContent = labelNew;
+            document.getElementById('absence-id').value = '';
+            document.getElementById('absence-start').value = '';
+            document.getElementById('absence-end').value = '';
+            document.getElementById('absence-note').value = '';
+            document.getElementById('btn-delete-absence').classList.add('d-none');
+            document.getElementById('modal-error').classList.add('d-none');
+            modal.show();
+        }
+
+        function openEditModal(event) {
+            const absenceId = event.id;
+
+            fetch('/calendar/absences/' + absenceId)
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('absenceModalTitle').textContent = labelEdit;
+                    document.getElementById('absence-id').value = data.id;
+                    document.getElementById('absence-start').value = data.startDate;
+                    document.getElementById('absence-end').value = data.endDate;
+                    document.getElementById('absence-note').value = data.note ?? '';
+                    document.getElementById('btn-delete-absence').classList.remove('d-none');
+                    document.getElementById('modal-error').classList.add('d-none');
+                    modal.show();
+                });
+        }
+
+        function saveAbsence() {
+            const id = document.getElementById('absence-id').value;
+            const payload = {
+                startDate: document.getElementById('absence-start').value,
+                endDate: document.getElementById('absence-end').value,
+                note: document.getElementById('absence-note').value,
+                _token: csrfToken,
+            };
+
+            const isNew = id === '';
+            const url = isNew ? createUrl : '/calendar/absences/' + id;
+            const method = isNew ? 'POST' : 'PUT';
+
+            fetch(url, {
+                method: method,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload),
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.error) {
+                        showModalError(data.error);
+                        return;
+                    }
+                    modal.hide();
+                    calendar.refetchEvents();
+                });
+        }
+
+        function deleteAbsence() {
+            const id = document.getElementById('absence-id').value;
+            if (!id || !confirm(confirmDelete)) {
+                return;
+            }
+
+            fetch('/calendar/absences/' + id, {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({_token: csrfToken}),
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.error) {
+                        showModalError(data.error);
+                        return;
+                    }
+                    modal.hide();
+                    calendar.refetchEvents();
+                });
+        }
+
+        function showModalError(message) {
+            const el = document.getElementById('modal-error');
+            el.textContent = message;
+            el.classList.remove('d-none');
+        }
+    </script>
+{% endblock %}

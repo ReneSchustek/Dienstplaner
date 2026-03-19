@@ -1,0 +1,176 @@
+<div id="dashboard" class="help-section">
+    <h2>Tableau de bord</h2>
+    <p>La page d'accueil après la connexion. Elle affiche le planning du mois en cours d'un coup d'œil.</p>
+    <ul>
+        <li>Utilise les flèches en haut pour changer de mois.</li>
+        <li>Le tableau affiche tous les jours de planification avec les personnes assignées par tâche.</li>
+        <li>Rien ne peut être modifié sur le tableau de bord – il sert uniquement à la consultation.</li>
+        <li>Les raccourcis au centre t'amènent directement aux zones les plus utilisées.</li>
+    </ul>
+</div>
+
+{% if is_granted('ROLE_PLANER') %}
+<div id="planung" class="help-section">
+    <h2>Planning</h2>
+    <p>C'est ici que le planning est créé. Le tableau affiche tous les jours de planification actifs du mois sélectionné.</p>
+    <ul>
+        <li><strong>Structure :</strong> Chaque ligne est un jour, chaque colonne est une tâche au sein d'un département.</li>
+        <li><strong>Assigner une personne :</strong> Ouvre le menu déroulant d'une cellule et sélectionne une personne dans la liste.</li>
+        <li><strong>Supprimer une assignation :</strong> Sélectionne l'entrée vide en haut du menu déroulant.</li>
+        <li>Une personne ne peut être planifiée qu'une seule fois par jour – toutes sections confondues.</li>
+        <li>Les personnes absentes ou ayant déjà une autre tâche ce jour-là n'apparaissent pas dans la liste.</li>
+        <li>Les jours bloqués par une date spéciale (ex. jour férié, congrès) affichent une note – rien ne peut y être saisi.</li>
+        <li>Le bouton « Imprimer » en haut à droite permet d'imprimer le planning directement depuis le navigateur.</li>
+        <li>Utilise les flèches en haut pour changer de mois.</li>
+    </ul>
+</div>
+{% endif %}
+
+<div id="kalender" class="help-section">
+    <h2>Calendrier</h2>
+    <p>Le calendrier affiche tous les événements dans une vue mensuelle : assignations, autres tâches, absences et dates spéciales.</p>
+    <ul>
+        <li><strong>Les assignations</strong> sont affichées en vert ; tes propres assignations sont plus claires.</li>
+        <li><strong>Les autres tâches</strong> (missions externes) apparaissent en orange.</li>
+        <li><strong>Les absences</strong> de ta personne sont affichées en bleu ; celles des autres en gris.</li>
+        <li><strong>Les dates spéciales</strong> (congrès, commémoration, etc.) apparaissent en violet.</li>
+        <li><strong>Condition requise :</strong> Ton compte doit être lié à un profil de personne. C'est ton administrateur qui s'en charge.</li>
+        <li>Le lien personnel de calendrier (iCal) est disponible dans le profil de personne – utilise-le pour connecter tes données à des applications de calendrier externes (ex. Google Agenda).</li>
+    </ul>
+</div>
+
+{% if is_granted('ROLE_PLANER') %}
+<div id="abwesenheiten" class="help-section">
+    <h2>Absences</h2>
+    <p>Saisis et gère les absences ici. Les absences enregistrées bloquent une personne dans le planning pour la période concernée.</p>
+    <ul>
+        <li><strong>Nouvelle absence :</strong> Clique sur « Nouveau » en haut à droite. Indique la personne, la date de début, la date de fin et éventuellement une raison. Pour une absence d'un jour, il suffit d'entrer la date de début – la date de fin est remplie automatiquement.</li>
+        <li><strong>Modifier / Supprimer :</strong> Clique sur « Modifier » dans la ligne de l'entrée.</li>
+        <li>La liste peut être filtrée par mois grâce au sélecteur de mois dans la barre de recherche.</li>
+        <li>Les colonnes peuvent être triées en cliquant sur l'en-tête de colonne.</li>
+        <li>Le nombre de lignes affichées par page est configurable dans les paramètres de la congrégation.</li>
+        <li><strong>Import TeamUp :</strong> Si une URL de calendrier TeamUp est enregistrée dans les paramètres de la congrégation, le bouton « Import TeamUp » peut être utilisé. Le système lit les absences automatiquement depuis le calendrier TeamUp et affiche un aperçu avant que les entrées soient sauvegardées.</li>
+    </ul>
+</div>
+
+<div id="besondere-daten" class="help-section">
+    <h2>Dates spéciales</h2>
+    <p>Jours sans service régulier – par exemple jours fériés ou congrès. Ces jours sont bloqués dans le planning.</p>
+    <ul>
+        <li><strong>Nouvelle entrée :</strong> Clique sur « Nouveau ». Sélectionne le type (jour férié, congrès, autre), saisis les dates de début et de fin et éventuellement un nom.</li>
+        <li>Pour un événement d'un seul jour, la date de début et la date de fin doivent être identiques.</li>
+        <li>Les jours concernés apparaissent avec une note dans le planning – aucune assignation n'y est possible.</li>
+        <li>Les entrées sur plusieurs jours (ex. congrès de plusieurs jours) bloquent tous les jours de la période.</li>
+    </ul>
+</div>
+{% endif %}
+
+{% if is_granted('ROLE_ASSEMBLY_ADMIN') %}
+<div id="andere-aufgaben" class="help-section">
+    <h2>Autres tâches</h2>
+    <p>Assignations en dehors du planning régulier – par exemple des services de congrès, des tâches spéciales ou des engagements externes. Ces entrées apparaissent comme note supplémentaire dans le planning au jour concerné.</p>
+    <ul>
+        <li><strong>Nouvelle entrée manuelle :</strong> Clique sur « Nouveau ». Sélectionne la personne, la date et entre une description.</li>
+        <li><strong>Import PDF :</strong> Clique sur « Import » et charge un fichier PDF. Le système lit les noms et les dates dans le fichier et tente de faire correspondre automatiquement les noms aux personnes connues de la congrégation. Une fenêtre de vérification s'ouvre ensuite directement au-dessus de la liste :
+            <ul>
+                <li>Chaque ligne reconnue affiche la date, la description et la personne suggérée.</li>
+                <li>L'assignation peut être corrigée manuellement via le menu déroulant.</li>
+                <li>Les lignes sans correspondance peuvent être assignées manuellement ou désélectionnées via la case à cocher.</li>
+                <li>Clique sur « Confirmer l'import » pour enregistrer toutes les entrées sélectionnées.</li>
+            </ul>
+        </li>
+        <li>La liste peut être filtrée par mois et triée par personne ou par date.</li>
+    </ul>
+</div>
+
+<div id="personen" class="help-section">
+    <h2>Personnes</h2>
+    <p>Liste de toutes les personnes de la congrégation. Les tâches pour lesquelles une personne peut être planifiée sont également assignées ici.</p>
+    <ul>
+        <li><strong>Nouvelle personne :</strong> Clique sur « Nouveau » et entre le nom. Les noms doivent être uniques – le système détecte les noms similaires (ex. « Dupont Jean » et « Jean Dupont ») et empêche les doublons.</li>
+        <li><strong>Assigner des tâches :</strong> Dans le formulaire de modification sous « Tâches assignées », coche les cases des tâches concernées. Seules ces tâches apparaîtront pour la personne dans la liste déroulante du planning.</li>
+        <li>Une personne sans tâches assignées n'apparaît nulle part dans le planning.</li>
+        <li><strong>Lier un compte utilisateur :</strong> Dans le formulaire de modification, une personne peut être connectée à un compte utilisateur. C'est nécessaire pour que l'utilisateur puisse voir son propre calendrier.</li>
+        <li><strong>Lien de calendrier :</strong> Via « Générer un token de calendrier » dans le formulaire de modification, la personne liée obtient un lien iCal personnel pour les applications de calendrier externes.</li>
+        <li>La liste peut être recherchée et triée par nom ou adresse e-mail.</li>
+    </ul>
+</div>
+
+<div id="abteilungen" class="help-section">
+    <h2>Départements</h2>
+    <p>Les départements regroupent plusieurs tâches en un bloc. Dans le planning, chaque département apparaît comme une section distincte avec un titre.</p>
+    <ul>
+        <li><strong>Nouveau département :</strong> Clique sur « Nouveau » et donne-lui un nom. Tu peux éventuellement choisir une couleur affichée comme couleur de fond dans le planning.</li>
+        <li>Chaque tâche doit appartenir à un département – les tâches ne peuvent pas être créées sans département.</li>
+        <li>Un département ne peut être supprimé que si aucune tâche ne lui est plus assignée.</li>
+    </ul>
+</div>
+
+<div id="aufgaben" class="help-section">
+    <h2>Tâches</h2>
+    <p>Services ou rôles individuels au sein d'un département – par exemple « Audio / Zoom », « Porte d'entrée » ou « Service de salle ».</p>
+    <ul>
+        <li><strong>Nouvelle tâche :</strong> Clique sur « Nouveau », entre un nom et sélectionne le département.</li>
+        <li>Seules les personnes ayant cette tâche assignée dans leur profil peuvent être sélectionnées dans le planning pour cette tâche.</li>
+        <li>L'ordre des tâches dans la liste correspond à l'ordre des colonnes dans le tableau de planning.</li>
+        <li>Une tâche ne peut être supprimée que si aucune entrée de planning ne lui est plus assignée.</li>
+    </ul>
+</div>
+
+<div id="suche" class="help-section">
+    <h2>Recherche &amp; Aperçus</h2>
+    <p>Cette zone propose différentes évaluations et outils de recherche. La navigation en haut de la zone permet de passer d'une vue à l'autre.</p>
+    <ul>
+        <li><strong>Recherche de personnes :</strong> Recherche une personne par nom. La vue détaillée affiche toutes les assignations et absences de la personne, filtrables par période.</li>
+        <li><strong>Recherche de tâches :</strong> Recherche une tâche, filtrée éventuellement par département. La vue détaillée montre toutes les personnes pouvant être planifiées pour cette tâche et combien de fois chacune l'a été.</li>
+        <li><strong>Disponibilité :</strong> Entre une date – la vue affiche toutes les personnes disponibles ce jour-là (non absentes, pas encore planifiées). Restriction optionnelle par tâche.</li>
+        <li><strong>Aperçu : Tâches → Personnes :</strong> Toutes les tâches avec les personnes assignées. Exportable en CSV.</li>
+        <li><strong>Aperçu : Personnes → Tâches :</strong> Toutes les personnes avec leurs tâches assignées. Exportable en CSV.</li>
+        <li><strong>Historique de planification :</strong> Toutes les assignations sur une période. Filtrable par personne, tâche et département. Exportable en CSV.</li>
+        <li><strong>Absences :</strong> Toutes les absences sur une période. Exportable en CSV.</li>
+        <li><strong>Statistiques de tâches :</strong> Nombre d'assignations par personne et département sur une période. Exportable en CSV.</li>
+        <li><strong>Équité &amp; Rotation :</strong> Matrice de toutes les personnes et tâches avec le nombre d'assignations. Les cellules sont codées par couleur : vert = dans la moyenne, jaune = en dessous de la moyenne, rouge = nettement au-dessus de la moyenne. Filtrable par année et mois. Exportable en CSV.</li>
+    </ul>
+</div>
+
+<div id="export" class="help-section">
+    <h2>Export</h2>
+    <p>Télécharger le planning terminé sous forme de fichier.</p>
+    <ul>
+        <li>Sélectionne le mois et l'année en haut, puis clique sur le format souhaité.</li>
+        <li><strong>PDF</strong> – formaté, adapté à l'impression ou à l'affichage.</li>
+        <li><strong>Excel (.xlsx)</strong> – tabulaire, modifiable dans Excel ou LibreOffice Calc.</li>
+        <li><strong>Word (.docx)</strong> – modifiable dans Word ou LibreOffice Writer.</li>
+        <li>Alternative : la page de planning possède un bouton « Imprimer » – utilise-le pour imprimer directement depuis le navigateur sans télécharger de fichier.</li>
+    </ul>
+</div>
+
+<div id="benutzerverwaltung" class="help-section">
+    <h2>Gestion des utilisateurs</h2>
+    <p>Créer et gérer les comptes utilisateurs de la congrégation.</p>
+    <ul>
+        <li><strong>Nouvel utilisateur :</strong> Clique sur « Nouveau ». Entre l'adresse e-mail et le rôle. Le système envoie automatiquement un mot de passe unique par e-mail. Le mot de passe doit être changé lors de la première connexion.</li>
+        <li><strong>Rôles :</strong>
+            <ul>
+                <li><strong>Admin de congrégation</strong> – Accès complet à toutes les données de la congrégation, gestion des utilisateurs et paramètres.</li>
+                <li><strong>Planificateur</strong> – Peut modifier le planning et gérer les absences et dates spéciales. Pas d'accès à la gestion des utilisateurs.</li>
+                <li><strong>Utilisateur</strong> – Accès en lecture seule. Peut voir son propre calendrier si un profil de personne est lié.</li>
+            </ul>
+        </li>
+        <li><strong>Réinitialiser le mot de passe :</strong> Envoie un nouveau mot de passe unique à l'adresse e-mail enregistrée. L'utilisateur doit le changer à la prochaine connexion.</li>
+        <li><strong>Lier une personne :</strong> Via « Modifier la personne », un compte utilisateur peut être connecté à un profil de personne. C'est nécessaire pour que l'utilisateur voie son calendrier.</li>
+        <li><strong>Supprimer un utilisateur :</strong> Le compte et la session sont supprimés. Les entrées de planning et les absences sont conservées.</li>
+    </ul>
+</div>
+{% endif %}
+
+<div id="profil" class="help-section">
+    <h2>Profil &amp; Compte</h2>
+    <p>Gérer tes propres informations de compte. Accessible via ton nom d'utilisateur en haut à droite ou la barre latérale.</p>
+    <ul>
+        <li><strong>Nom et e-mail :</strong> Peuvent être modifiés à tout moment.</li>
+        <li><strong>Changer le mot de passe :</strong> Entre ton mot de passe actuel, puis le nouveau mot de passe (deux fois pour confirmer).</li>
+        <li><strong>Authentification à deux facteurs (2FA) :</strong> Active la 2FA pour une sécurité accrue lors de la connexion. Tu as besoin d'une application d'authentification (ex. Google Authenticator, Aegis). Scanne le QR code dans l'application et entre le code à 6 chiffres généré. Ce code sera ensuite requis à chaque connexion.</li>
+        <li><strong>Supprimer le compte :</strong> Dans la section « Zone dangereuse » en bas. Cette action est irréversible. Tes absences et entrées de planning sont conservées ; le compte et la connexion sont supprimés.</li>
+    </ul>
+</div>

@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'title.legal'|trans }}{% endblock %}
+{% block page_title %}{{ 'title.legal'|trans }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="dp-card mb-4">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">Betreiber</h2>
+            <p><strong>Ruhrcoder – Full Stack Development</strong><br>
+            René Schustek<br>
+            Somborner Höh 14<br>
+            43888 Dortmund</p>
+            <p style="margin-top: 12px;">E-Mail: <a href="mailto:info@ruhrcoder.de">info@ruhrcoder.de</a></p>
+            <div style="margin-top: 16px;">
+                <img src="/images/firma.webp" alt="Ruhrcoder – René Schustek" style="max-width: 300px; border-radius: 6px;">
+            </div>
+        </div>
+
+        <div class="dp-card mb-4">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">Haftungsausschluss</h2>
+            <p>Dieses Projekt ist ein privates Softwareprojekt und wird ausschließlich einer geschlossenen Benutzergruppe zur Verfügung gestellt.</p>
+            <ul style="margin-top: 12px; padding-left: 20px; line-height: 1.8;">
+                <li>Es wird keine Haftung für die Richtigkeit, Vollständigkeit oder Aktualität der Inhalte übernommen.</li>
+                <li>Die Nutzung erfolgt auf eigene Verantwortung.</li>
+                <li>Es besteht kein Anspruch auf Verfügbarkeit, Fehlerfreiheit oder Support.</li>
+                <li>Eine Weitergabe an Dritte ist nicht vorgesehen.</li>
+            </ul>
+        </div>
+
+        <div class="dp-card mb-4">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">Interne Nutzung</h2>
+            <p>Die Anwendung ist nicht öffentlich zugänglich. Inhalte, Funktionen und Daten sind ausschließlich für interne Zwecke bestimmt.</p>
+        </div>
+
+        <div class="dp-card">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">Version</h2>
+            <p>Version 1.0</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

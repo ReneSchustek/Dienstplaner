@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'assembly_token.title'|trans }}{% endblock %}
+{% block page_title %}{{ 'assembly_token.title'|trans }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fs-4">{{ assembly.name }} – {{ 'assembly_token.title'|trans }}</h1>
+    </div>
+
+    {# Abwesenheits-Token #}
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">{{ 'assembly_token.absence.title'|trans }}</div>
+        <div class="card-body">
+            <p class="text-muted small mb-3">{{ 'assembly_token.absence.description'|trans }}</p>
+            {% if assembly.publicAbsenceToken %}
+                <div class="input-group input-group-sm mb-3">
+                    <input type="text" id="absence-token-url" class="form-control form-control-sm"
+                           value="{{ url('assembly_public_absences', {token: assembly.publicAbsenceToken}) }}" readonly>
+                    <button class="btn btn-outline-secondary btn-sm" type="button"
+                            onclick="copyAssemblyLink('absence-token-url', this)">
+                        {{ 'calendar_token.btn_copy'|trans }}
+                    </button>
+                </div>
+                <div class="d-flex gap-2">
+                    <form method="post" action="{{ path('assembly_token_absence_generate') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('assembly-absence-token-' ~ assembly.id) }}">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">{{ 'assembly_token.btn_reset'|trans }}</button>
+                    </form>
+                    <form method="post" action="{{ path('assembly_token_absence_revoke') }}"
+                          onsubmit="return confirm('{{ 'assembly_token.confirm_revoke'|trans }}')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('assembly-absence-token-revoke-' ~ assembly.id) }}">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">{{ 'assembly_token.btn_revoke'|trans }}</button>
+                    </form>
+                </div>
+            {% else %}
+                <p class="text-muted small mb-2">{{ 'assembly_token.no_token'|trans }}</p>
+                <form method="post" action="{{ path('assembly_token_absence_generate') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('assembly-absence-token-' ~ assembly.id) }}">
+                    <button type="submit" class="btn btn-primary btn-sm">{{ 'assembly_token.btn_generate'|trans }}</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Vollständiger Kalender-Token #}
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">{{ 'assembly_token.calendar.title'|trans }}</div>
+        <div class="card-body">
+            <p class="text-muted small mb-3">{{ 'assembly_token.calendar.description'|trans }}</p>
+            {% if assembly.publicCalendarToken %}
+                <div class="input-group input-group-sm mb-3">
+                    <input type="text" id="calendar-token-url" class="form-control form-control-sm"
+                           value="{{ url('assembly_public_calendar', {token: assembly.publicCalendarToken}) }}" readonly>
+                    <button class="btn btn-outline-secondary btn-sm" type="button"
+                            onclick="copyAssemblyLink('calendar-token-url', this)">
+                        {{ 'calendar_token.btn_copy'|trans }}
+                    </button>
+                </div>
+                <div class="d-flex gap-2">
+                    <form method="post" action="{{ path('assembly_token_calendar_generate') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('assembly-calendar-token-' ~ assembly.id) }}">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">{{ 'assembly_token.btn_reset'|trans }}</button>
+                    </form>
+                    <form method="post" action="{{ path('assembly_token_calendar_revoke') }}"
+                          onsubmit="return confirm('{{ 'assembly_token.confirm_revoke'|trans }}')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('assembly-calendar-token-revoke-' ~ assembly.id) }}">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">{{ 'assembly_token.btn_revoke'|trans }}</button>
+                    </form>
+                </div>
+            {% else %}
+                <p class="text-muted small mb-2">{{ 'assembly_token.no_token'|trans }}</p>
+                <form method="post" action="{{ path('assembly_token_calendar_generate') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('assembly-calendar-token-' ~ assembly.id) }}">
+                    <button type="submit" class="btn btn-primary btn-sm">{{ 'assembly_token.btn_generate'|trans }}</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function copyAssemblyLink(inputId, btn) {
+    var input = document.getElementById(inputId);
+    var original = btn.textContent;
+    var onCopied = function () {
+        btn.textContent = '✓';
+        btn.classList.replace('btn-outline-secondary', 'btn-success');
+        setTimeout(function () {
+            btn.textContent = original;
+            btn.classList.replace('btn-success', 'btn-outline-secondary');
+        }, 2000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(input.value).then(onCopied).catch(function () {
+            input.select(); document.execCommand('copy'); onCopied();
+        });
+    } else {
+        input.select(); document.execCommand('copy'); onCopied();
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'title.dashboard'|trans }}{% endblock %}
+{% block page_title %}{{ 'title.dashboard'|trans }}{% endblock %}
+
+{% block content %}
+
+<div class="dp-card mb-4">
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+        <strong style="font-size: 0.875rem; color: var(--color-text-secondary);">{{ 'dashboard.quick_access'|trans }}</strong>
+        <a href="{{ path('planning_index') }}" class="btn btn-primary btn-sm">{{ 'dashboard.to_planning'|trans }}</a>
+        <a href="{{ path('calendar_index') }}" class="btn btn-outline-secondary btn-sm">{{ 'dashboard.to_calendar'|trans }}</a>
+        {% if is_granted('ROLE_PLANER') %}
+            <a href="{{ path('absence_index') }}" class="btn btn-outline-secondary btn-sm">{{ 'dashboard.manage_absences'|trans }}</a>
+            <a href="{{ path('export_index') }}" class="btn btn-outline-secondary btn-sm">{{ 'nav.export'|trans }}</a>
+        {% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('assembly_index') }}" class="btn btn-outline-secondary btn-sm">{{ 'nav.assemblies'|trans }}</a>
+            <a href="{{ path('admin_user_index') }}" class="btn btn-outline-secondary btn-sm">{{ 'nav.users'|trans }}</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="dp-card text-center">
+            <div style="font-size: 2rem; font-weight: 700; color: var(--color-accent);">{{ assemblies|length }}</div>
+            <div style="font-size: 0.875rem; color: var(--color-text-secondary); margin-top: 4px;">{{ 'dashboard.assemblies'|trans }}</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="dp-card text-center">
+            <div style="font-size: 2rem; font-weight: 700; color: var(--color-accent);">{{ persons|length }}</div>
+            <div style="font-size: 0.875rem; color: var(--color-text-secondary); margin-top: 4px;">{{ 'dashboard.persons'|trans }}</div>
+        </div>
+    </div>
+</div>
+
+{% if assembly is not null %}
+<div class="dp-card mb-4">
+    {{ include('dashboard/_aushang.html.twig') }}
+</div>
+{% else %}
+{% if is_granted('ROLE_ADMIN') %}
+<div class="alert alert-warning d-flex align-items-center gap-3">
+    <div>
+        <strong>{{ 'dashboard.admin_no_assembly_title'|trans }}</strong>
+        {{ 'dashboard.admin_no_assembly_hint'|trans }}
+    </div>
+    <a href="{{ path('assembly_index') }}" class="btn btn-warning btn-sm text-nowrap">{{ 'nav.assemblies'|trans }}</a>
+</div>
+{% else %}
+<div class="alert alert-info">{{ 'dashboard.no_assembly'|trans }}</div>
+{% endif %}
+{% endif %}
+
+{% endblock %}

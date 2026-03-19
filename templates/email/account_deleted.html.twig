@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Konto gelöscht</title>
+</head>
+<body style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 24px;">
+    <h2 style="color: #c0392b;">Konto gelöscht</h2>
+
+    <p>Ein Benutzerkonto wurde gelöscht:</p>
+
+    <table style="border-collapse: collapse; width: 100%; margin-bottom: 16px;">
+        <tr>
+            <td style="padding: 6px 12px 6px 0; font-weight: bold; white-space: nowrap;">Benutzer:</td>
+            <td style="padding: 6px 0;">{{ deletedName }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 6px 12px 6px 0; font-weight: bold;">E-Mail:</td>
+            <td style="padding: 6px 0;">{{ deletedEmail }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 6px 12px 6px 0; font-weight: bold;">Versammlung:</td>
+            <td style="padding: 6px 0;">{{ assemblyName }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 6px 12px 6px 0; font-weight: bold;">Datum:</td>
+            <td style="padding: 6px 0;">{{ deletedAt }}</td>
+        </tr>
+    </table>
+
+    <p style="color: #666; font-size: 0.875rem;">
+        Das verknüpfte Personenprofil bleibt erhalten. Planungsdaten sind nicht betroffen.
+    </p>
+
+    <hr style="border: none; border-top: 1px solid #ddd; margin: 24px 0;">
+    <p style="color: #999; font-size: 0.75rem;">Dienstplaner – automatische Benachrichtigung</p>
+</body>
+</html>

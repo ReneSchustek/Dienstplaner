@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+
+    <style>
+        @page {
+            margin: 12mm 10mm 14mm 10mm;
+        }
+
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 11px;
+            margin: 0;
+            color: #111;
+        }
+
+        /* Layout */
+        .page-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .page-table thead {
+            display: table-header-group;
+        }
+
+        /* Linke Linie */
+        .col-line {
+            width: 4px;
+        }
+
+        tbody td.col-line {
+            border-left: 2px solid {{ assembly.lineColor|default('#2c3e50') }};
+        }
+
+        /* Inhalt */
+        .col-content {
+            padding-left: 2px;
+        }
+
+        /* Header */
+        .header-row td.col-content {
+            border-bottom: 2px solid {{ assembly.lineColor|default('#2c3e50') }};
+            padding-bottom: 3mm;
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            color: {{ assembly.lineColor|default('#2c3e50') }};
+        }
+
+        /* Tag */
+        .day-title {
+            font-weight: bold;
+            margin: 4mm 0 2mm;
+            width: 100%;
+        }
+
+        .day-title-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .day-week {
+            font-size: 9px;
+            color: #777;
+            text-align: right;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        /* Tabelle */
+        .day-grid {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+
+        .day-grid td {
+            padding: 4px;
+            text-align: center;
+            font-size: 10px;
+            border: 1px solid #bbb;
+        }
+
+        /* Aufgabenzeile */
+        .row-task td {
+            background: #f5f5f5;
+            font-weight: bold;
+        }
+
+        /* Sonderfälle */
+        .day-special {
+            font-weight: bold;
+            color: {{ assembly.lineColor|default('#2c3e50') }};
+            margin: 4px 0 6px;
+            text-align: center;
+        }
+
+        /* Footer */
+        .page-footer {
+            position: fixed;
+            bottom: -6mm;
+            left: 10mm;
+            right: 10mm;
+            font-size: 9px;
+        }
+
+        .page-number:after {
+            content: counter(page);
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-footer">
+    Seite <span class="page-number"></span>
+    <span style="float:right;">Stand: {{ "now"|date('d.m.Y') }}</span>
+</div>
+
+{% set deptBlocks = {} %}
+{% for task in tasks|sort((a,b)=> a.name <=> b.name) %}
+    {% set dk = 'd' ~ task.department.id %}
+    {% if deptBlocks[dk] is not defined %}
+        {% set deptBlocks = deptBlocks|merge({(dk): {tasks: []}}) %}
+    {% endif %}
+    {% set deptBlocks = deptBlocks|merge({
+        (dk): deptBlocks[dk]|merge({
+            tasks: deptBlocks[dk].tasks|merge([task])
+        })
+    }) %}
+{% endfor %}
+
+{# Maximale Spaltenanzahl über alle Abteilungen ermitteln #}
+{% set maxCols = 0 %}
+{% for dk, deptData in deptBlocks %}
+    {% if deptData.tasks|length > maxCols %}
+        {% set maxCols = deptData.tasks|length %}
+    {% endif %}
+{% endfor %}
+
+<table class="page-table">
+
+    <thead>
+    <tr class="header-row">
+        <td class="col-line"></td>
+        <td class="col-content">
+            <table style="width:100%;">
+                <tr>
+                    <td>{{ assembly.name }}</td>
+                    <td class="header-title">{{ assembly.planName ?? 'Dienstplan' }}</td>
+                    <td style="text-align:right;">{{ monthName }}</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    </thead>
+
+    <tbody>
+
+    {% set prevKW = null %}
+    {% for dayId, dayData in grid %}
+        {% set currentKW = dayData.day.date|date('W') %}
+        <tr>
+            <td class="col-line"></td>
+            <td class="col-content">
+
+                <div class="day-title">
+                    <table class="day-title-table"><tr>
+                            <td><span>{{ dayData.day.date|date('d.m.Y') }} ({{ ('day.' ~ dayData.day.date|date('D'))|trans }})</span></td>
+                            <td class="day-week">{% if currentKW != prevKW %}KW {{ currentKW }}{% endif %}</td>
+                        </tr></table>
+                </div>
+
+                {% if dayData.isBlocked %}
+
+                    <div class="day-special">
+                        {{ dayData.specialLabel|trans }}
+                    </div>
+
+                {% else %}
+
+                    <table class="day-grid">
+                        {% for dk, deptData in deptBlocks %}
+                            {% set colCount = deptData.tasks|length %}
+                            {% set padCount = maxCols - colCount %}
+
+                            <tr class="row-task">
+                                {% for task in deptData.tasks %}
+                                    <td>{{ task.name }}</td>
+                                {% endfor %}
+                                {% if padCount > 0 %}{% for i in 1..padCount %}<td></td>{% endfor %}{% endif %}
+                            </tr>
+
+                            <tr>
+                                {% for task in deptData.tasks %}
+                                    {% set personName = dayData.assignments[task.id].person.name ?? '' %}
+                                    <td>{{ personName ?: '–' }}</td>
+                                {% endfor %}
+                                {% if padCount > 0 %}{% for i in 1..padCount %}<td></td>{% endfor %}{% endif %}
+                            </tr>
+
+                        {% endfor %}
+                    </table>
+
+                {% endif %}
+
+            </td>
+        </tr>
+        {% set prevKW = currentKW %}
+    {% endfor %}
+
+    </tbody>
+</table>
+
+</body>
+</html>

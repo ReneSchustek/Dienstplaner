@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ task.name }}{% endblock %}
+{% block page_title %}{{ task.name }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-10">
+        <div class="mb-3">
+            <a href="{{ path('search_tasks') }}" class="btn btn-sm btn-outline-secondary">← {{ 'btn.back'|trans }}</a>
+            {% if is_granted('ROLE_PLANER') %}
+            <a href="{{ path('task_edit', {id: task.id}) }}" class="btn btn-sm btn-outline-primary ms-1">{{ 'btn.edit'|trans }}</a>
+            {% endif %}
+        </div>
+
+        <div class="dp-card mb-4">
+            <h5 style="font-weight: 600; margin-bottom: 8px;">{{ task.department.name }} › {{ task.name }}</h5>
+            {% if lastAssignment %}
+            <p class="text-muted" style="font-size: 0.9rem;">{{ 'search.task.last_assignment'|trans }}: {{ lastAssignment.day.date|date('d.m.Y') }} – {{ lastAssignment.person.name }}</p>
+            {% endif %}
+        </div>
+
+        <div class="dp-card mb-4">
+            <h5 style="font-weight: 600; margin-bottom: 12px;">{{ 'search.task.eligible'|trans }}</h5>
+            {% if eligiblePersons is empty %}
+            <p class="text-muted">{{ 'search.task.no_eligible'|trans }}</p>
+            {% else %}
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>{{ 'table.name'|trans }}</th>
+                        <th>{{ 'search.person.count'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for person in eligiblePersons %}
+                    <tr>
+                        <td><a href="{{ path('search_person_detail', {id: person.id}) }}">{{ person.name }}</a></td>
+                        <td>{{ countByPerson[person.id] ?? 0 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+
+        <div class="dp-card">
+            <h5 style="font-weight: 600; margin-bottom: 12px;">{{ 'search.task.never_assigned'|trans }}</h5>
+            {% set neverAssigned = [] %}
+            {% for person in allPersons %}
+                {% if countByPerson[person.id] is not defined %}
+                    {% set neverAssigned = neverAssigned|merge([person]) %}
+                {% endif %}
+            {% endfor %}
+            {% if neverAssigned is empty %}
+            <p class="text-muted">{{ 'search.no_results'|trans }}</p>
+            {% else %}
+            <ul class="list-unstyled mb-0" style="column-count: 2; font-size: 0.9rem;">
+                {% for person in neverAssigned %}
+                <li>{{ person.name }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

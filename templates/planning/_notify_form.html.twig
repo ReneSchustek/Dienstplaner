@@ -1,0 +1,13 @@
+{# Partial: Benachrichtigungs-Button für Planungsseite #}
+{# Requires: year, month #}
+{% if is_granted('ROLE_ASSEMBLY_ADMIN') %}
+<form method="post"
+      action="{{ path('planning_notify', {year: year, month: month}) }}"
+      class="d-inline"
+      onsubmit="return confirm('{{ 'planning.notify_confirm'|trans|e('js') }}')">
+    <input type="hidden" name="_token" value="{{ csrf_token('planning-notify-' ~ year ~ '-' ~ month) }}">
+    <button type="submit" class="btn btn-outline-primary btn-sm">
+        {{ 'planning.notify_btn'|trans }}
+    </button>
+</form>
+{% endif %}

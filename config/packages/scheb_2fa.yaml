@@ -1,0 +1,18 @@
+scheb_two_factor:
+    security_tokens:
+        - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken
+
+    totp:
+        enabled: true
+        server_name: "Dienstplaner"
+        issuer: "Dienstplaner"
+
+    email:
+        enabled: true
+        sender_email: "%env(MAILER_SENDER_EMAIL)%"
+        sender_name: "%env(MAILER_SENDER_NAME)%"
+        template: "security/2fa_email.html.twig"
+        digits: 6
+
+    backup_codes:
+        enabled: true

@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'title.tasks'|trans }}{% endblock %}
+{% block page_title %}{{ 'title.tasks'|trans }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ 'title.tasks'|trans }}</h1>
+        {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTaskModal">
+            {{ 'btn.new.task'|trans }}
+        </button>
+        {% endif %}
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{{ 'table.name'|trans }}</th>
+                        <th>{{ 'table.department'|trans }}</th>
+                        <th>{{ 'table.assembly'|trans }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>{{ task.name }}</td>
+                        <td>
+                            {{ task.department.name }}
+                            <span class="badge ms-1" data-dept-color="{{ task.department.color }}">&nbsp;</span>
+                        </td>
+                        <td>{{ task.department.assembly.name }}</td>
+                        <td class="text-end">
+                            <a href="{{ path('task_edit', {id: task.id}) }}" class="btn btn-sm btn-outline-primary">{{ 'btn.edit'|trans }}</a>
+                            <form method="post" action="{{ path('task_delete', {id: task.id}) }}" class="d-inline"
+                                  onsubmit="return confirm('{{ 'confirm.delete'|trans }}')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete-task-' ~ task.id) }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">{{ 'btn.delete'|trans }}</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-muted text-center">{{ 'msg.no.tasks'|trans }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if is_granted('ROLE_ASSEMBLY_ADMIN') %}
+<div class="modal fade" id="newTaskModal" tabindex="-1" aria-labelledby="newTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newTaskModalLabel">{{ 'btn.new.task'|trans }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'btn.cancel'|trans }}"></button>
+            </div>
+            {{ form_start(newTaskForm) }}
+            <div class="modal-body">
+                <div class="mb-3">
+                    {{ form_label(newTaskForm.name) }}
+                    {{ form_widget(newTaskForm.name) }}
+                    {{ form_errors(newTaskForm.name) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(newTaskForm.department) }}
+                    {{ form_widget(newTaskForm.department) }}
+                    {{ form_errors(newTaskForm.department) }}
+                </div>
+                {{ form_rest(newTaskForm) }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'btn.cancel'|trans }}</button>
+                <button type="submit" class="btn btn-primary">{{ 'btn.save'|trans }}</button>
+            </div>
+            {{ form_end(newTaskForm) }}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'import.review_title'|trans }}{% endblock %}
+{% block page_title %}{{ 'import.review_title'|trans }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    {% if items is empty %}
+        <div class="alert alert-info">{{ 'import.no_events'|trans }}</div>
+        <a href="{{ path('external_task_index') }}" class="btn btn-outline-secondary">{{ 'btn.back'|trans }}</a>
+    {% else %}
+    <p class="text-muted mb-3">{{ 'import.review_hint'|trans }}</p>
+    <form method="post" action="{{ path('external_task_import_confirm') }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('external-task-import-confirm') }}">
+
+        <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th style="width: 40px;"><input type="checkbox" id="check-all" checked></th>
+                    <th>{{ 'table.date'|trans }}</th>
+                    <th>{{ 'import.ics_summary'|trans }}</th>
+                    <th>{{ 'label.description'|trans }}</th>
+                    <th>{{ 'table.person'|trans }}</th>
+                    <th>{{ 'import.match_type'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i, item in items %}
+                <tr>
+                    <td>
+                        <input type="checkbox" name="selected[]" value="{{ i }}" checked>
+                    </td>
+                    <td class="text-nowrap">{{ (item.date ?? item.date_start)|date('d.m.Y') }}</td>
+                    <td>{{ item.summary }}</td>
+                    <td>{{ item.description is defined and item.description != item.summary ? item.description : '–' }}</td>
+                    <td>
+                        <select name="person_id[{{ i }}]" class="form-select form-select-sm" style="min-width: 160px;">
+                            <option value="0">– {{ 'import.no_person'|trans }} –</option>
+                            {% for person in persons %}
+                            <option value="{{ person.id }}"
+                                {% if item.person_id == person.id %}selected{% endif %}>
+                                {{ person.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        {% if item.match_type == 'exact' %}
+                            <span class="badge bg-success">{{ 'import.match_exact'|trans }}</span>
+                        {% elseif item.match_type == 'partial' %}
+                            <span class="badge bg-warning text-dark">{{ 'import.match_partial'|trans }}</span>
+                        {% else %}
+                            <span class="badge bg-danger">{{ 'import.match_none'|trans }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-primary">{{ 'btn.import_confirm'|trans }}</button>
+            <a href="{{ path('external_task_index') }}" class="btn btn-outline-secondary">{{ 'btn.cancel'|trans }}</a>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+{% block javascripts %}
+<script>
+document.getElementById('check-all')?.addEventListener('change', function() {
+    document.querySelectorAll('input[name="selected[]"]').forEach(cb => cb.checked = this.checked);
+});
+</script>
+{% endblock %}
+{% endblock %}

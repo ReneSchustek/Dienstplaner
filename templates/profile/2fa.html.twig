@@ -1,0 +1,215 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'title.2fa'|trans }}{% endblock %}
+{% block page_title %}{{ 'title.2fa'|trans }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-7">
+
+        {% if newBackupCodes is not null %}
+        <div class="dp-card mb-4" style="border-left: 4px solid #198754;">
+            <h5 style="font-weight: 600; margin-bottom: 12px; color: #198754;">{{ '2fa.backup_codes.new_title'|trans }}</h5>
+            <p>{{ '2fa.backup_codes.save_hint'|trans }}</p>
+            <div style="font-family: monospace; font-size: 1.05rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; margin-top: 12px;">
+                {% for code in newBackupCodes %}
+                <span>{{ code }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {# Methoden-Auswahl #}
+        <div class="dp-card mb-4">
+            <h5 style="font-weight: 600; margin-bottom: 12px;">{{ '2fa.method_title'|trans }}</h5>
+            {% if policy == 'disabled' %}
+                <p class="text-muted">{{ '2fa.policy.disabled_hint'|trans }}</p>
+            {% else %}
+            <form method="post" action="{{ path('profile_2fa_method') }}" class="d-flex gap-3 align-items-center flex-wrap">
+                <input type="hidden" name="_token" value="{{ csrf_token('2fa-method') }}">
+                {% if policy == 'user_choice' %}
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="method" id="method-none" value=""
+                           {{ user.twoFactorMethod is null ? 'checked' : '' }}>
+                    <label class="form-check-label" for="method-none">{{ '2fa.method.none'|trans }}</label>
+                </div>
+                {% endif %}
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="method" id="method-totp" value="totp"
+                           {{ user.twoFactorMethod == 'totp' ? 'checked' : '' }}>
+                    <label class="form-check-label" for="method-totp">{{ '2fa.method.totp'|trans }}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="method" id="method-email" value="email"
+                           {{ user.twoFactorMethod == 'email' ? 'checked' : '' }}>
+                    <label class="form-check-label" for="method-email">{{ '2fa.method.email'|trans }}</label>
+                </div>
+                <button type="submit" class="btn btn-outline-primary btn-sm">{{ 'btn.save'|trans }}</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <div class="dp-card mb-4">
+            <h5 style="font-weight: 600; margin-bottom: 12px;">{{ '2fa.status_title'|trans }}</h5>
+
+            {% if user.totpAuthenticationEnabled %}
+            <p>
+                <span class="badge bg-success">{{ '2fa.status.enabled'|trans }}</span>
+                {% if user.twoFactorRequired %}
+                <span class="badge bg-warning text-dark ms-1">{{ '2fa.required_by_admin'|trans }}</span>
+                {% endif %}
+            </p>
+
+            <div class="mt-3">
+                <p class="text-muted" style="font-size: 0.9rem;">{{ '2fa.backup_codes.count'|trans({'%count%': user.backupCodes|length}) }}</p>
+            </div>
+
+            <hr>
+
+            <h6 class="mt-3">{{ '2fa.disable_title'|trans }}</h6>
+            <form method="post" action="{{ path('profile_2fa_disable') }}" class="row g-2 align-items-end">
+                <input type="hidden" name="_token" value="{{ csrf_token('2fa-disable') }}">
+                <div class="col-auto">
+                    <label for="disable-code" class="form-label">{{ '2fa.code_label'|trans }}</label>
+                    <input type="text" id="disable-code" name="code" class="form-control"
+                           inputmode="numeric" maxlength="10" placeholder="000000" autocomplete="off" required>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-outline-danger">{{ '2fa.btn.disable'|trans }}</button>
+                </div>
+            </form>
+
+            <hr>
+
+            <h6 class="mt-3">{{ '2fa.backup_codes.regenerate_title'|trans }}</h6>
+            <form method="post" action="{{ path('profile_2fa_backup_codes') }}" class="row g-2 align-items-end">
+                <input type="hidden" name="_token" value="{{ csrf_token('2fa-backup-codes') }}">
+                <div class="col-auto">
+                    <label for="regen-code" class="form-label">{{ '2fa.code_label'|trans }}</label>
+                    <input type="text" id="regen-code" name="code" class="form-control"
+                           inputmode="numeric" maxlength="10" placeholder="000000" autocomplete="off" required>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-outline-secondary">{{ '2fa.btn.regenerate_backup_codes'|trans }}</button>
+                </div>
+            </form>
+
+            {% else %}
+            <p>
+                <span class="badge bg-secondary">{{ '2fa.status.disabled'|trans }}</span>
+                {% if user.twoFactorRequired %}
+                <span class="badge bg-warning text-dark ms-1">{{ '2fa.required_by_admin'|trans }}</span>
+                {% endif %}
+            </p>
+
+            {% if pendingSecret is null %}
+            <form method="post" action="{{ path('profile_2fa_setup') }}" class="mt-3">
+                <input type="hidden" name="_token" value="{{ csrf_token('2fa-setup') }}">
+                <button type="submit" class="btn btn-primary">{{ '2fa.btn.setup'|trans }}</button>
+            </form>
+            {% endif %}
+            {% endif %}
+        </div>
+
+        {% if pendingSecret is not null %}
+        <div class="dp-card mb-4">
+            <h5 style="font-weight: 600; margin-bottom: 12px;">{{ '2fa.setup_title'|trans }}</h5>
+            <p>{{ '2fa.setup_instructions'|trans }}</p>
+
+            {% if qrCodeUri %}
+            <div class="text-center my-3">
+                <img src="{{ qrCodeUri }}" alt="QR Code" style="width: 200px; height: 200px; border: 4px solid #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+            </div>
+            {% endif %}
+
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                {{ '2fa.setup_manual_code'|trans }}<br>
+                <code style="font-size: 0.9rem; letter-spacing: 2px;">{{ pendingSecret }}</code>
+            </p>
+
+            <hr>
+            <p>{{ '2fa.setup_confirm_instructions'|trans }}</p>
+
+            <form method="post" action="{{ path('profile_2fa_confirm') }}" class="row g-2 align-items-end">
+                <input type="hidden" name="_token" value="{{ csrf_token('2fa-confirm') }}">
+                <div class="col-auto">
+                    <label for="confirm-code" class="form-label">{{ '2fa.code_label'|trans }}</label>
+                    <input type="text" id="confirm-code" name="code" class="form-control"
+                           inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000"
+                           autocomplete="one-time-code" required autofocus>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-success">{{ '2fa.btn.confirm'|trans }}</button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+    </div>
+
+    {# Kalender-Token #}
+    <div class="col-lg-5">
+        <div class="dp-card">
+            <h5 style="font-weight: 600; margin-bottom: 8px;">{{ 'calendar_token.section_title'|trans }}</h5>
+            <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 16px;">{{ 'calendar_token.description'|trans }}</p>
+
+            {% if user.calendarToken %}
+                <label class="form-label form-label-sm">{{ 'calendar_token.link_label'|trans }}</label>
+                <div class="input-group input-group-sm mb-3">
+                    <input type="text" id="calendar-token-url" class="form-control"
+                           value="{{ url('calendar_token_view', {token: user.calendarToken}) }}" readonly>
+                    <button class="btn btn-outline-secondary" type="button" onclick="copyCalendarLink(this)">
+                        {{ 'calendar_token.btn_copy'|trans }}
+                    </button>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <form method="post" action="{{ path('profile_calendar_token_generate') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('calendar-token-generate') }}">
+                        <button type="submit" class="btn btn-outline-primary btn-sm">{{ 'calendar_token.btn_reset'|trans }}</button>
+                    </form>
+                    <form method="post" action="{{ path('profile_calendar_token_revoke') }}"
+                          onsubmit="return confirm('{{ 'calendar_token.btn_revoke'|trans|e('js') }}?')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('calendar-token-revoke') }}">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">{{ 'calendar_token.btn_revoke'|trans }}</button>
+                    </form>
+                </div>
+            {% else %}
+                <p class="text-muted">{{ 'calendar_token.no_token'|trans }}</p>
+                <form method="post" action="{{ path('profile_calendar_token_generate') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('calendar-token-generate') }}">
+                    <button type="submit" class="btn btn-primary btn-sm">{{ 'calendar_token.btn_generate'|trans }}</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function copyCalendarLink(btn) {
+    const input = document.getElementById('calendar-token-url');
+    const original = btn.textContent;
+
+    const onCopied = () => {
+        btn.textContent = '✓';
+        btn.classList.replace('btn-outline-secondary', 'btn-success');
+        setTimeout(() => {
+            btn.textContent = original;
+            btn.classList.replace('btn-success', 'btn-outline-secondary');
+        }, 2000);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(input.value).then(onCopied).catch(() => {
+            input.select();
+            document.execCommand('copy');
+            onCopied();
+        });
+    } else {
+        input.select();
+        document.execCommand('copy');
+        onCopied();
+    }
+}
+</script>
+{% endblock %}

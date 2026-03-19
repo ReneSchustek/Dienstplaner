@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ 'calendar_token.title'|trans }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <style>
+        body { background: #f5f5f5; margin: 0; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+        .calendar-day { min-height: 60px; background: #fff; padding: 4px 6px; border-radius: 4px; font-size: 0.85em; }
+        .calendar-day.other-month { background: #f0f0f0; color: #bbb; }
+        .calendar-day.today { border: 2px solid #0d6efd; }
+        .calendar-day.has-event { background: #fff3cd; }
+        .calendar-weekday { background: #dee2e6; text-align: center; font-weight: 600; font-size: 0.8em; padding: 4px; }
+        .badge-absence { background: #fd7e14; color: #fff; border-radius: 3px; padding: 1px 4px; font-size: 0.7em; display: block; margin-top: 1px; }
+        .badge-ext-task { background: #0dcaf0; color: #000; border-radius: 3px; padding: 1px 4px; font-size: 0.7em; display: block; margin-top: 1px; }
+        .badge-assignment { background: #198754; color: #fff; border-radius: 3px; padding: 1px 4px; font-size: 0.7em; display: block; margin-top: 1px; }
+        .badge-special { background: #6f42c1; color: #fff; border-radius: 3px; padding: 1px 4px; font-size: 0.7em; display: block; margin-top: 1px; }
+    </style>
+</head>
+<body>
+
+{{ include('public/_header.html.twig', {
+    appName: 'calendar_token.title'|trans ~ (person ? ' – ' ~ person.name : ''),
+    subtitle: user.assembly ? user.assembly.name : null
+}) }}
+
+<div class="container py-4" style="max-width: 960px">
+
+    {# Month Navigation #}
+    {% set prevMonth = month == 1 ? 12 : month - 1 %}
+    {% set prevYear  = month == 1 ? year - 1 : year %}
+    {% set nextMonth = month == 12 ? 1 : month + 1 %}
+    {% set nextYear  = month == 12 ? year + 1 : year %}
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <a href="{{ path('calendar_token_view', {token: token, year: prevYear, month: prevMonth}) }}" class="btn btn-outline-secondary btn-sm">&laquo;</a>
+
+        <form method="get" action="{{ path('calendar_token_view', {token: token}) }}" class="d-flex gap-2 align-items-center">
+            <select name="month" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
+                {% for m in 1..12 %}
+                    <option value="{{ m }}" {{ m == month ? 'selected' : '' }}>{{ ('month.' ~ m)|trans }}</option>
+                {% endfor %}
+            </select>
+            <select name="year" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
+                {% for y in (year - 2)..(year + 2) %}
+                    <option value="{{ y }}" {{ y == year ? 'selected' : '' }}>{{ y }}</option>
+                {% endfor %}
+            </select>
+        </form>
+
+        <a href="{{ path('calendar_token_view', {token: token, year: nextYear, month: nextMonth}) }}" class="btn btn-outline-secondary btn-sm">&raquo;</a>
+    </div>
+
+    {# Build lookup maps for grid display #}
+    {% set extTasksByDate = {} %}
+    {% for et in externalTasks %}
+        {% set d = et.day.date|date('Y-m-d') %}
+        {% if extTasksByDate[d] is not defined %}{% set extTasksByDate = extTasksByDate|merge({(d): []}) %}{% endif %}
+        {% set extTasksByDate = extTasksByDate|merge({(d): extTasksByDate[d]|merge([et])}) %}
+    {% endfor %}
+
+    {% set assignmentsByDate = {} %}
+    {% for a in assignments %}
+        {% set d = a.day.date|date('Y-m-d') %}
+        {% if assignmentsByDate[d] is not defined %}{% set assignmentsByDate = assignmentsByDate|merge({(d): []}) %}{% endif %}
+        {% set assignmentsByDate = assignmentsByDate|merge({(d): assignmentsByDate[d]|merge([a])}) %}
+    {% endfor %}
+
+    {# Calendar Grid #}
+    {# Note: specialDates are filtered per day in the loop below using date range check #}
+    <div class="calendar-grid mb-4">
+        {% for wd in ['day.Mon', 'day.Tue', 'day.Wed', 'day.Thu', 'day.Fri', 'day.Sat', 'day.Sun'] %}
+            <div class="calendar-weekday">{{ wd|trans }}</div>
+        {% endfor %}
+
+        {% set firstWeekday = date(year ~ '-' ~ (month < 10 ? '0' ~ month : month) ~ '-01')|date('N')|number_format %}
+        {% for i in 1..(firstWeekday - 1) %}
+            <div class="calendar-day other-month"></div>
+        {% endfor %}
+
+        {% set daysInMonth = date(year ~ '-' ~ (month < 10 ? '0' ~ month : month) ~ '-01')|date('t')|number_format %}
+        {% set today = 'now'|date('Y-m-d') %}
+
+        {% for d in 1..daysInMonth %}
+            {% set dayStr = year ~ '-' ~ (month < 10 ? '0' ~ month : month) ~ '-' ~ (d < 10 ? '0' ~ d : d) %}
+            {% set isToday = dayStr == today %}
+
+            {% set dayAbsences = [] %}
+            {% for absence in absences %}
+                {% if absence.startDate|date('Y-m-d') <= dayStr and absence.endDate|date('Y-m-d') >= dayStr %}
+                    {% set dayAbsences = dayAbsences|merge([absence]) %}
+                {% endif %}
+            {% endfor %}
+
+            {% set dayExtTasks = extTasksByDate[dayStr] is defined ? extTasksByDate[dayStr] : [] %}
+            {% set dayAssignments = assignmentsByDate[dayStr] is defined ? assignmentsByDate[dayStr] : [] %}
+
+            {% set daySpecialDates = [] %}
+            {% for sd in specialDates %}
+                {% if sd.startDate|date('Y-m-d') <= dayStr and sd.endDate|date('Y-m-d') >= dayStr %}
+                    {% set daySpecialDates = daySpecialDates|merge([sd]) %}
+                {% endif %}
+            {% endfor %}
+
+            {% set hasEvent = dayAbsences|length > 0 or dayExtTasks|length > 0 or dayAssignments|length > 0 or daySpecialDates|length > 0 %}
+
+            <div class="calendar-day{% if isToday %} today{% endif %}{% if hasEvent %} has-event{% endif %}">
+                <span class="fw-bold">{{ d }}</span>
+                {% for absence in dayAbsences %}
+                    <span class="badge-absence" title="{{ absence.note ?? '' }}">{{ 'calendar_token.absent'|trans }}</span>
+                {% endfor %}
+                {% for et in dayExtTasks %}
+                    <span class="badge-ext-task" title="{{ et.description ?? '' }}">{{ et.description ? et.description|slice(0, 10) ~ '…' : 'Aufgabe' }}</span>
+                {% endfor %}
+                {% for a in dayAssignments %}
+                    <span class="badge-assignment" title="{{ a.task.name }}">{{ a.task.name|slice(0, 10) }}</span>
+                {% endfor %}
+                {% for sd in daySpecialDates %}
+                    <span class="badge-special" title="{{ sd.note ?? '' }}">{{ (sd.typeEnum.label())|trans|slice(0, 10) }}</span>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+
+    {# Absences #}
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>{{ 'calendar_token.absences'|trans }}</strong>
+            {% if person %}
+                <button class="btn btn-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#new-absence-form">
+                    {{ 'btn.add_absence'|trans }}
+                </button>
+            {% endif %}
+        </div>
+        {% if person %}
+        <div class="collapse" id="new-absence-form">
+            <div class="card-body border-bottom">
+                <form method="post" action="{{ path('calendar_token_absence_new', {token: token}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('calendar-token-absence-' ~ token) }}">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-auto">
+                            <label class="form-label form-label-sm">{{ 'label.start_date'|trans }}</label>
+                            <input type="date" name="start_date" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label form-label-sm">{{ 'label.end_date'|trans }}</label>
+                            <input type="date" name="end_date" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label form-label-sm">{{ 'label.note'|trans }}</label>
+                            <input type="text" name="note" class="form-control form-control-sm" maxlength="255">
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary btn-sm">{{ 'btn.save'|trans }}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+        <div class="list-group list-group-flush">
+            {% if absences is empty %}
+                <div class="list-group-item text-muted">{{ 'calendar_token.no_absences'|trans }}</div>
+            {% else %}
+                {% for absence in absences|sort((a, b) => a.startDate <=> b.startDate) %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            {{ absence.startDate|date('d.m.Y') }}
+                            {% if absence.startDate|date('Y-m-d') != absence.endDate|date('Y-m-d') %}
+                                – {{ absence.endDate|date('d.m.Y') }}
+                            {% endif %}
+                            {% if absence.note %}
+                                <span class="text-muted ms-2">{{ absence.note }}</span>
+                            {% endif %}
+                        </span>
+                        {% if person %}
+                            <form method="post" action="{{ path('calendar_token_absence_delete', {token: token, id: absence.id}) }}" onsubmit="return confirm('{{ 'calendar.confirm.delete'|trans|e('js') }}')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete-absence-' ~ absence.id) }}">
+                                <button type="submit" class="btn btn-danger btn-sm">{{ 'btn.delete'|trans }}</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    {# External Tasks #}
+    {% if person %}
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>{{ 'calendar_token.external_tasks'|trans }}</strong>
+            <button class="btn btn-info btn-sm" data-bs-toggle="collapse" data-bs-target="#new-ext-task-form">
+                {{ 'calendar_token.btn_add_external_task'|trans }}
+            </button>
+        </div>
+        <div class="collapse" id="new-ext-task-form">
+            <div class="card-body border-bottom">
+                <form method="post" action="{{ path('calendar_token_external_task_new', {token: token}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('calendar-token-ext-' ~ token) }}">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-auto">
+                            <label class="form-label form-label-sm">{{ 'calendar_token.ext_task_date'|trans }}</label>
+                            <input type="date" name="date" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label form-label-sm">{{ 'calendar_token.ext_task_label'|trans }}</label>
+                            <input type="text" name="description" class="form-control form-control-sm" maxlength="500">
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary btn-sm">{{ 'btn.save'|trans }}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="list-group list-group-flush">
+            {% if externalTasks is empty %}
+                <div class="list-group-item text-muted">{{ 'calendar_token.no_external_tasks'|trans }}</div>
+            {% else %}
+                {% for et in externalTasks %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <span class="badge" style="background:#0dcaf0;color:#000;">{{ et.day.date|date('d.m.Y') }}</span>
+                            {% if et.description %}
+                                <span class="ms-2">{{ et.description }}</span>
+                            {% endif %}
+                        </span>
+                        <form method="post" action="{{ path('calendar_token_external_task_delete', {token: token, id: et.id}) }}" onsubmit="return confirm('{{ 'confirm.delete'|trans|e('js') }}')">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete-ext-task-' ~ et.id) }}">
+                            <button type="submit" class="btn btn-danger btn-sm">{{ 'btn.delete'|trans }}</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# Assignments (readonly) #}
+    <div class="card mb-4">
+        <div class="card-header">
+            <strong>{{ 'calendar_token.assignments'|trans }}</strong>
+        </div>
+        <div class="list-group list-group-flush">
+            {% if assignments is empty %}
+                <div class="list-group-item text-muted">{{ 'calendar_token.no_assignments'|trans }}</div>
+            {% else %}
+                {% for a in assignments %}
+                    <div class="list-group-item">
+                        <span class="badge bg-success me-2">{{ a.day.date|date('d.m.Y') }}</span>
+                        {{ a.task.name }}
+                        <span class="text-muted small ms-1">({{ a.task.department.name }})</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    {# Special Dates #}
+    {% if specialDates is not empty or user.assembly %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <strong>{{ 'calendar_token.special_dates'|trans }}</strong>
+        </div>
+        <div class="list-group list-group-flush">
+            {% if specialDates is empty %}
+                <div class="list-group-item text-muted">{{ 'calendar_token.no_special_dates'|trans }}</div>
+            {% else %}
+                {% for sd in specialDates|sort((a, b) => a.startDate <=> b.startDate) %}
+                    <div class="list-group-item">
+                        <span class="badge" style="background:#6f42c1;color:#fff;">{{ sd.startDate|date('d.m.Y') }}{% if sd.startDate|date('Y-m-d') != sd.endDate|date('Y-m-d') %} – {{ sd.endDate|date('d.m.Y') }}{% endif %}</span>
+                        <span class="ms-2">{{ (sd.typeEnum.label())|trans }}</span>
+                        {% if sd.note %}
+                            <span class="text-muted ms-1">{{ sd.note }}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="text-center text-muted small mb-4">{{ 'calendar_token.hint'|trans }}</div>
+</div>
+
+{{ include('public/_footer.html.twig') }}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

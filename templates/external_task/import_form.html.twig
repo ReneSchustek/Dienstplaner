@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'import.upload_title'|trans }}{% endblock %}
+{% block page_title %}{{ 'import.upload_title'|trans }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="dp-card">
+                <p class="text-muted mb-3">{{ 'import.pdf_upload_hint'|trans }}</p>
+
+                <form method="post" enctype="multipart/form-data"
+                      action="{{ path('external_task_import') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('external-task-import') }}">
+
+                    <div class="mb-3">
+                        <label for="pdf_file" class="form-label">{{ 'import.pdf_file'|trans }}</label>
+                        <input type="file" id="pdf_file" name="pdf_file"
+                               accept=".pdf,application/pdf"
+                               class="form-control" required>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">{{ 'import.parse_btn'|trans }}</button>
+                        <a href="{{ path('external_task_index') }}" class="btn btn-outline-secondary">{{ 'btn.cancel'|trans }}</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

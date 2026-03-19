@@ -1,0 +1,176 @@
+<div id="dashboard" class="help-section">
+    <h2>Dashboard</h2>
+    <p>Die Startseite nach dem Login. Hier siehst du den Dienstplan des aktuellen Monats auf einen Blick.</p>
+    <ul>
+        <li>Mit den Pfeiltasten oben wechselst du den Monat.</li>
+        <li>Die Tabelle zeigt alle Planungstage mit den zugeordneten Personen je Aufgabe.</li>
+        <li>Auf dem Dashboard kann nichts bearbeitet werden – es dient nur zur Anzeige.</li>
+        <li>Die Schnellzugriffe in der Mitte führen direkt zu den häufig genutzten Bereichen.</li>
+    </ul>
+</div>
+
+{% if is_granted('ROLE_PLANER') %}
+<div id="planung" class="help-section">
+    <h2>Planung</h2>
+    <p>Hier wird der Dienstplan erstellt. Die Tabelle zeigt alle aktiven Planungstage des gewählten Monats.</p>
+    <ul>
+        <li><strong>Aufbau:</strong> Jede Zeile ist ein Tag, jede Spalte eine Aufgabe innerhalb einer Abteilung.</li>
+        <li><strong>Person zuweisen:</strong> Klappe das Dropdown einer Zelle auf und wähle eine Person aus der Liste.</li>
+        <li><strong>Zuweisung entfernen:</strong> Wähle im Dropdown den leeren Eintrag oben.</li>
+        <li>Eine Person kann pro Tag nur einmal eingeplant werden – auch über Abteilungsgrenzen hinweg.</li>
+        <li>Personen, die an dem Tag abwesend sind oder bereits eine andere Aufgabe haben, erscheinen nicht in der Auswahl.</li>
+        <li>Tage, die durch einen besonderen Termin gesperrt sind (z. B. Feiertag, Kongress), zeigen einen Hinweis – dort kann nichts eingetragen werden.</li>
+        <li>Mit dem Button „Drucken" oben rechts kannst du den aktuellen Plan direkt aus dem Browser drucken.</li>
+        <li>Mit den Pfeilen oben wechselst du den Monat.</li>
+    </ul>
+</div>
+{% endif %}
+
+<div id="kalender" class="help-section">
+    <h2>Kalender</h2>
+    <p>Der Kalender zeigt alle Ereignisse der Versammlung in einer Monatsübersicht: Diensteinteilungen, andere Aufgaben, Abwesenheiten und besondere Daten.</p>
+    <ul>
+        <li><strong>Diensteinteilungen</strong> werden grün angezeigt, eigene Einteilungen sind heller hervorgehoben.</li>
+        <li><strong>Andere Aufgaben</strong> (externe Einsätze) erscheinen in Orange.</li>
+        <li><strong>Abwesenheiten</strong> eigener Personen werden blau angezeigt; Abwesenheiten anderer grau.</li>
+        <li><strong>Besondere Daten</strong> (Kongress, Gedächtnisfeier usw.) erscheinen in Lila.</li>
+        <li><strong>Voraussetzung:</strong> Dein Benutzerkonto muss mit einem Personenprofil verknüpft sein. Das richtet dein Administrator ein.</li>
+        <li>Den persönlichen Kalenderlink (iCal) findest du im Personenprofil – damit kannst du deine Daten in externe Kalender-Apps (z. B. Google Kalender) einbinden.</li>
+    </ul>
+</div>
+
+{% if is_granted('ROLE_PLANER') %}
+<div id="abwesenheiten" class="help-section">
+    <h2>Abwesenheiten</h2>
+    <p>Hier trägst du Abwesenheiten von Personen ein und verwaltest sie. Eingetragene Abwesenheiten sperren eine Person in der Planung für den jeweiligen Zeitraum.</p>
+    <ul>
+        <li><strong>Neue Abwesenheit:</strong> Klick auf „Neu" oben rechts. Gib Person, Von-Datum, Bis-Datum und optional einen Grund an. Bei einer eintägigen Abwesenheit reicht es, nur das Von-Datum einzutragen – das Bis-Datum wird automatisch gefüllt.</li>
+        <li><strong>Bearbeiten / Löschen:</strong> Klick auf „Bearbeiten" in der Zeile des Eintrags.</li>
+        <li>Die Liste kann nach Monat gefiltert werden (Monatsauswahl oben links in der Suchleiste).</li>
+        <li>Spalten können durch Klick auf die Spaltenüberschrift sortiert werden.</li>
+        <li>Die Anzahl der angezeigten Zeilen pro Seite lässt sich in den Versammlungseinstellungen konfigurieren.</li>
+        <li><strong>TeamUp-Import:</strong> Wenn in den Versammlungseinstellungen eine TeamUp-Kalender-URL hinterlegt ist, kann der Button „TeamUp-Import" genutzt werden. Das System liest die Abwesenheiten automatisch aus dem TeamUp-Kalender und zeigt eine Vorschau zur Überprüfung, bevor die Einträge übernommen werden.</li>
+    </ul>
+</div>
+
+<div id="besondere-daten" class="help-section">
+    <h2>Besondere Daten</h2>
+    <p>Tage, an denen kein regulärer Dienst stattfindet – z. B. Feiertage oder Kongresse. Diese Tage sind in der Planung gesperrt.</p>
+    <ul>
+        <li><strong>Neuer Eintrag:</strong> Klick auf „Neu". Wähle den Typ (Feiertag, Kongress, Sonstiges), trage Von- und Bis-Datum ein und vergib optional einen Namen.</li>
+        <li>Bei einem eintägigen Termin müssen Von- und Bis-Datum gleich sein.</li>
+        <li>In der Planungsansicht erscheinen betroffene Tage mit einem Hinweis auf den Typ – eine Zuweisung ist dort nicht möglich.</li>
+        <li>Mehrtägige Termine (z. B. ein mehrtägiger Kongress) sperren alle Tage im Zeitraum.</li>
+    </ul>
+</div>
+{% endif %}
+
+{% if is_granted('ROLE_ASSEMBLY_ADMIN') %}
+<div id="andere-aufgaben" class="help-section">
+    <h2>Andere Aufgaben</h2>
+    <p>Einsätze von Personen außerhalb des regulären Dienstplans – zum Beispiel Kongress-Dienste, Sonderaufgaben oder externe Verpflichtungen. Diese Einträge erscheinen in der Planungsansicht als zusätzlicher Hinweis beim jeweiligen Tag.</p>
+    <ul>
+        <li><strong>Neuer Eintrag manuell:</strong> Klick auf „Neu". Wähle Person, Datum und gib eine Beschreibung ein.</li>
+        <li><strong>PDF-Import:</strong> Klick auf „Import" und lade eine PDF-Datei hoch. Das System liest Namen und Daten aus der Datei und versucht, die Namen automatisch den bekannten Personen der Versammlung zuzuordnen. Anschließend öffnet sich ein Überprüfungsfenster direkt über der Liste:
+            <ul>
+                <li>Jede erkannte Zeile zeigt Datum, Bezeichnung und die vorgeschlagene Person.</li>
+                <li>Die Zuordnung kann per Dropdown manuell korrigiert werden.</li>
+                <li>Zeilen ohne Treffer können manuell einer Person zugewiesen oder per Checkbox abgewählt werden.</li>
+                <li>Klick auf „Import bestätigen" speichert alle ausgewählten Einträge.</li>
+            </ul>
+        </li>
+        <li>Die Liste kann nach Monat gefiltert und nach Person oder Datum sortiert werden.</li>
+    </ul>
+</div>
+
+<div id="personen" class="help-section">
+    <h2>Personen</h2>
+    <p>Liste aller Personen der Versammlung. Hier werden auch die Aufgaben zugeordnet, für die eine Person eingeplant werden kann.</p>
+    <ul>
+        <li><strong>Neue Person:</strong> Klick auf „Neu" und gib den Namen ein. Der Name muss eindeutig sein – das System erkennt ähnliche Namen (z. B. „Müller Max" und „Max Müller") und verhindert doppelte Einträge.</li>
+        <li><strong>Aufgaben zuordnen:</strong> Im Bearbeitungsformular unter „Zugeordnete Aufgaben" die Häkchen für die relevanten Aufgaben setzen. Nur diese Aufgaben erscheinen für die Person in der Planungsauswahl.</li>
+        <li>Eine Person ohne zugeordnete Aufgaben erscheint in der Planung nirgendwo.</li>
+        <li><strong>Benutzerkonto verknüpfen:</strong> Im Bearbeitungsformular kann eine Person mit einem Benutzerkonto verbunden werden. Das ist Voraussetzung dafür, dass der Benutzer seinen eigenen Kalender sehen kann.</li>
+        <li><strong>Kalenderlink:</strong> Über „Kalender-Token generieren" im Bearbeitungsformular erhält die verknüpfte Person einen persönlichen iCal-Link für externe Kalender-Apps.</li>
+        <li>Die Liste kann durchsucht und nach Name oder E-Mail sortiert werden.</li>
+    </ul>
+</div>
+
+<div id="abteilungen" class="help-section">
+    <h2>Abteilungen</h2>
+    <p>Abteilungen fassen mehrere Aufgaben zu einem Block zusammen. In der Planungsansicht erscheint jede Abteilung als eigener Abschnitt mit Überschrift.</p>
+    <ul>
+        <li><strong>Neue Abteilung:</strong> Klick auf „Neu" und vergib einen Namen. Optional kannst du eine Farbe wählen, die in der Planung als Hintergrundfarbe angezeigt wird.</li>
+        <li>Jede Aufgabe muss einer Abteilung zugeordnet sein – Aufgaben ohne Abteilung können nicht angelegt werden.</li>
+        <li>Das Löschen einer Abteilung ist nur möglich, wenn ihr keine Aufgaben mehr zugeordnet sind.</li>
+    </ul>
+</div>
+
+<div id="aufgaben" class="help-section">
+    <h2>Aufgaben</h2>
+    <p>Einzelne Dienste oder Funktionen innerhalb einer Abteilung – zum Beispiel „Audio / Zoom", „Eingangsordner" oder „Saaldienst".</p>
+    <ul>
+        <li><strong>Neue Aufgabe:</strong> Klick auf „Neu", gib einen Namen ein und wähle die Abteilung aus.</li>
+        <li>Nur Personen, denen diese Aufgabe im Personenprofil zugewiesen ist, können in der Planung für diese Aufgabe ausgewählt werden.</li>
+        <li>Die Reihenfolge der Aufgaben in der Liste entspricht der Reihenfolge der Spalten in der Planungstabelle.</li>
+        <li>Das Löschen einer Aufgabe ist nur möglich, wenn ihr keine Planungseinträge mehr zugeordnet sind.</li>
+    </ul>
+</div>
+
+<div id="suche" class="help-section">
+    <h2>Suche &amp; Übersichten</h2>
+    <p>Dieser Bereich bietet verschiedene Auswertungen und Suchwerkzeuge. Die Navigation oben im Bereich wechselt zwischen den Ansichten.</p>
+    <ul>
+        <li><strong>Personensuche:</strong> Suche nach einer Person per Name. Die Detailansicht zeigt alle Einsätze und Abwesenheiten der Person, optional gefiltert nach Zeitraum.</li>
+        <li><strong>Aufgabensuche:</strong> Suche nach einer Aufgabe, optional gefiltert nach Abteilung. Die Detailansicht zeigt alle Personen, die für diese Aufgabe eingeplant werden können, und wie oft jede Person bisher eingeplant war.</li>
+        <li><strong>Verfügbarkeit:</strong> Gib ein Datum ein – die Ansicht zeigt alle Personen, die an diesem Tag verfügbar sind (nicht abwesend, nicht bereits eingeplant). Optional nach Aufgabe einschränken.</li>
+        <li><strong>Übersicht: Aufgaben → Personen:</strong> Alle Aufgaben mit den jeweils zugeordneten Personen. Als CSV exportierbar.</li>
+        <li><strong>Übersicht: Personen → Aufgaben:</strong> Alle Personen mit ihren zugeordneten Aufgaben. Als CSV exportierbar.</li>
+        <li><strong>Planungshistorie:</strong> Alle Einsätze in einem Zeitraum. Filterbar nach Person, Aufgabe und Abteilung. Als CSV exportierbar.</li>
+        <li><strong>Abwesenheiten:</strong> Alle Abwesenheiten in einem Zeitraum. Als CSV exportierbar.</li>
+        <li><strong>Aufgabenstatistik:</strong> Einsatzzahlen pro Person und Abteilung in einem Zeitraum. Als CSV exportierbar.</li>
+        <li><strong>Fairness &amp; Rotation:</strong> Matrix aller Personen und Aufgaben mit Einsatzzahlen. Zellen sind farbig markiert: grün = im Durchschnitt, gelb = unter dem Schnitt, rot = deutlich über dem Schnitt. Filterbar nach Jahr und Monat. Als CSV exportierbar.</li>
+    </ul>
+</div>
+
+<div id="export" class="help-section">
+    <h2>Export</h2>
+    <p>Den fertigen Dienstplan als Datei herunterladen.</p>
+    <ul>
+        <li>Oben Monat und Jahr auswählen, dann das gewünschte Format klicken.</li>
+        <li><strong>PDF</strong> – fertig formatiert, direkt druckbar oder als Aushang geeignet.</li>
+        <li><strong>Excel (.xlsx)</strong> – tabellarisch, bearbeitbar in Excel oder LibreOffice Calc.</li>
+        <li><strong>Word (.docx)</strong> – bearbeitbar in Word oder LibreOffice Writer.</li>
+        <li>Alternativ: Auf der Planungsseite gibt es den Button „Drucken" – damit kannst du den Plan direkt aus dem Browser drucken, ohne eine Datei herunterzuladen.</li>
+    </ul>
+</div>
+
+<div id="benutzerverwaltung" class="help-section">
+    <h2>Benutzerverwaltung</h2>
+    <p>Benutzerkonten für die Versammlung anlegen und verwalten.</p>
+    <ul>
+        <li><strong>Neuer Benutzer:</strong> Klick auf „Neu". E-Mail-Adresse und Rolle eingeben. Das System sendet automatisch ein Einmal-Passwort per E-Mail. Beim ersten Login muss das Passwort geändert werden.</li>
+        <li><strong>Rollen:</strong>
+            <ul>
+                <li><strong>Versammlungsadmin</strong> – Vollzugriff auf alle Daten der Versammlung, Benutzerverwaltung, Einstellungen.</li>
+                <li><strong>Planer</strong> – Darf den Dienstplan bearbeiten sowie Abwesenheiten und besondere Daten pflegen. Kein Zugriff auf Benutzerverwaltung.</li>
+                <li><strong>Benutzer</strong> – Nur Lesezugriff. Kann den eigenen Kalender sehen, wenn ein Personenprofil verknüpft ist.</li>
+            </ul>
+        </li>
+        <li><strong>Passwort zurücksetzen:</strong> Sendet ein neues Einmal-Passwort an die hinterlegte E-Mail. Der Benutzer muss es beim nächsten Login ändern.</li>
+        <li><strong>Person verknüpfen:</strong> Über „Person bearbeiten" kann ein Benutzerkonto mit einem Personenprofil verbunden werden. Das ist notwendig, damit der Benutzer seinen Kalender sehen kann.</li>
+        <li><strong>Benutzer löschen:</strong> Das Konto und die Session werden gelöscht. Planungseinträge und Abwesenheiten bleiben erhalten.</li>
+    </ul>
+</div>
+{% endif %}
+
+<div id="profil" class="help-section">
+    <h2>Profil &amp; Konto</h2>
+    <p>Eigene Kontodaten verwalten. Erreichbar über den Benutzernamen oben rechts oder die Sidebar.</p>
+    <ul>
+        <li><strong>Name und E-Mail:</strong> Können jederzeit selbst geändert werden.</li>
+        <li><strong>Passwort ändern:</strong> Aktuelles Passwort eingeben, dann das neue Passwort (zweimal zur Bestätigung).</li>
+        <li><strong>Zwei-Faktor-Authentifizierung (2FA):</strong> Aktiviere 2FA für zusätzliche Sicherheit beim Login. Dazu benötigst du eine Authenticator-App (z. B. Google Authenticator, Aegis). Scanne den QR-Code in der App und gib den generierten 6-stelligen Code ein. Ab dann ist dieser Code bei jedem Login erforderlich.</li>
+        <li><strong>Konto löschen:</strong> Im Bereich „Gefahrenzone" ganz unten. Die Aktion ist nicht rückgängig zu machen. Deine Abwesenheiten und Planungseinträge bleiben erhalten, das Konto und die Anmeldung werden entfernt.</li>
+    </ul>
+</div>

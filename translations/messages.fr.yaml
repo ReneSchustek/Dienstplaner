@@ -1,0 +1,514 @@
+# Navigation
+nav.dashboard: "Tableau de bord"
+nav.planning: Planification
+nav.calendar: Calendrier
+nav.absences: Absences
+nav.external_tasks: "Autres tâches"
+nav.special_dates: "Dates spéciales"
+nav.persons: Personnes
+nav.departments: "Départements"
+nav.tasks: "Tâches"
+nav.export: Export
+nav.assemblies: "Assemblées"
+nav.users: Utilisateurs
+nav.help: Aide
+nav.profile: "Mon profil"
+nav.2fa: "Auth. à deux facteurs"
+nav.search: "Recherche & Aperçus"
+nav.legal: "Mentions légales"
+nav.privacy: "Protection des données"
+nav.section.management: Gestion
+nav.section.administration: Administration
+nav.section.system: "Système"
+nav.logout: "Se déconnecter"
+
+# Titres de pages
+title.dashboard: "Tableau de bord"
+title.planning: Planification
+title.calendar: "Calendrier"
+title.absences: Absences
+title.external_tasks: "Autres tâches"
+title.special_dates: "Dates spéciales"
+title.special_date.new: "Nouvelle date spéciale"
+title.special_date.edit: "Modifier la date spéciale"
+title.persons: Personnes
+title.departments: "Départements"
+title.tasks: "Tâches"
+title.export: Export
+title.assemblies: "Assemblées"
+title.users: "Gestion des utilisateurs"
+title.help: Aide
+help.nav.dashboard: "Tableau de bord"
+help.nav.planning: Planning
+help.nav.calendar: Calendrier
+help.nav.absences: Absences
+help.nav.special_dates: "Dates spéciales"
+help.nav.other_tasks: "Autres tâches"
+help.nav.persons: Personnes
+help.nav.departments: "Départements"
+help.nav.tasks: "Tâches"
+help.nav.search: Recherche
+help.nav.export: Export
+help.nav.users: "Gestion des utilisateurs"
+help.nav.profile: "Profil & Compte"
+help.close: Fermer
+help.show_all: Afficher tous les sujets
+help.full_page: Page d'aide complète
+title.2fa: "Authentification à deux facteurs"
+title.legal: "Mentions légales"
+title.privacy: "Politique de confidentialité"
+
+# Boutons
+btn.save: Enregistrer
+btn.save_all: "Tout enregistrer"
+btn.reset: "Réinitialiser"
+btn.reset_hint: "Annuler les modifications et recharger les données"
+btn.cancel: Annuler
+btn.back: Retour
+btn.delete: Supprimer
+btn.edit: Modifier
+btn.show: Afficher
+btn.login: "Se connecter"
+btn.new.assembly: "+ Nouvelle assemblée"
+btn.new.department: "+ Nouveau département"
+btn.new.person: "+ Nouvelle personne"
+btn.new.task: "+ Nouvelle tâche"
+btn.new.absence: "+ Nouvelle absence"
+btn.new.external_task: "+ Nouvelle autre tâche"
+btn.new.special_date: "+ Nouvelle date spéciale"
+btn.new.user: "+ Nouvel utilisateur"
+btn.add_absence: "+ Ajouter une absence"
+btn.download.pdf: "Télécharger PDF"
+btn.download.excel: "Télécharger Excel"
+btn.teamup.import: "Importer TeamUp"
+btn.search: Rechercher
+btn.details: "Détails"
+
+# Colonnes de tableau
+table.name: Nom
+table.address: Adresse
+table.weekdays: "Jours de la semaine"
+table.departments: "Départements"
+table.assembly: "Assemblée"
+table.department: "Département"
+table.tasks: "Tâches"
+table.person: Personne
+table.email: E-Mail
+table.phone: "Téléphone"
+table.role: "Rôle"
+table.from: Du
+table.to: Au
+table.note: Remarque
+table.date: Date
+
+# Labels de formulaire
+label.name: Nom
+label.street: Rue
+label.zip: "Code postal"
+label.city: Ville
+label.weekdays: "Jours d'assemblée"
+label.plan_name: "Nom du plan"
+label.line_color: "Couleur de ligne"
+label.footer_text: "Texte libre"
+label.page_size: "Lignes par page"
+label.email: E-Mail
+label.password: "Mot de passe"
+label.password.new: "Nouveau mot de passe (vide = inchangé)"
+label.role: "Rôle"
+label.assembly: "Assemblée"
+label.department: "Département"
+label.department.planer: "Département (planificateurs uniquement)"
+label.color: Couleur
+label.start_date: Du
+label.end_date: Au
+label.note: Remarque
+label.person: Personne
+label.person.calendar: "Personne liée (pour le calendrier)"
+label.phone: "Téléphone"
+label.theme: "Thème"
+label.language: "Langue"
+label.year: "Année"
+label.month: Mois
+label.day: Jour
+label.description: Description
+label.remember_me: "Rester connecté"
+label.teamup_url: "URL ICS TeamUp (optionnel)"
+label.tasks: "Tâches assignées"
+label.2fa_required: "Exiger la 2FA (obligatoire pour cet utilisateur)"
+label.special_date.type: Type
+label.from: "De"
+label.to: "À"
+label.total: "Total"
+
+# Messages flash
+flash.assembly.created: "Assemblée créée."
+flash.assembly.saved: "Assemblée enregistrée."
+flash.assembly.deleted: "Assemblée supprimée."
+flash.department.created: "Département créé."
+flash.department.saved: "Département enregistré."
+flash.department.deleted: "Département supprimé."
+flash.person.created: "Personne créée."
+flash.person.saved: "Personne enregistrée."
+flash.person.deleted: "Personne supprimée."
+flash.person.duplicate_name: "Une personne portant ce nom (ou un nom équivalent) existe déjà dans cette assemblée."
+flash.task.created: "Tâche créée."
+flash.task.saved: "Tâche enregistrée."
+flash.task.deleted: "Tâche supprimée."
+flash.absence.created: "Absence ajoutée."
+flash.absence.saved: "Absence enregistrée."
+flash.absence.deleted: "Absence supprimée."
+flash.external_task.created: "Autre tâche ajoutée."
+flash.external_task.saved: "Autre tâche enregistrée."
+flash.external_task.deleted: "Autre tâche supprimée."
+flash.special_date.created: "Date spéciale créée."
+flash.special_date.saved: "Date spéciale enregistrée."
+flash.special_date.deleted: "Date spéciale supprimée."
+flash.user.created: "Utilisateur créé."
+flash.user.saved: "Utilisateur enregistré."
+flash.user.deleted: "Utilisateur supprimé."
+flash.user.invitation_sent: "Utilisateur créé et invitation envoyée par e-mail."
+flash.mail.error: "L'e-mail n'a pas pu être envoyé. Contacte l'administrateur."
+flash.user.password_reset: "Nouveau mot de passe unique généré et envoyé par e-mail."
+flash.user.calendar_link_sent: "Lien du calendrier envoyé par e-mail."
+flash.user.no_calendar_token: "Cet utilisateur n'a pas de lien de calendrier."
+flash.user.already_linked: "Cette personne a déjà un compte utilisateur."
+flash.user.invalid_email: "Adresse e-mail invalide."
+btn.send_calendar_link: "Envoyer le lien du calendrier"
+btn.create_user: "Créer un compte utilisateur"
+user.no_linked_account: "Aucun compte utilisateur associé."
+role.user: "Utilisateur"
+role.planer: "Planificateur"
+role.assembly_admin: "Admin de l'assemblée"
+btn.reset_password: "Réinitialiser le mot de passe"
+user.reset_password_hint: "Génère un nouveau mot de passe unique et l'envoie à l'utilisateur par e-mail."
+user.reset_password_confirm: "Vraiment générer un nouveau mot de passe et l'envoyer par e-mail ?"
+flash.theme.saved: "Thème enregistré."
+flash.2fa.enabled: "L'authentification à deux facteurs a été activée."
+flash.2fa.disabled: "L'authentification à deux facteurs a été désactivée."
+flash.2fa.code_invalid: "Code invalide. Veuillez réessayer."
+flash.2fa.backup_codes_regenerated: "Les codes de secours ont été régénérés."
+flash.csrf.invalid: "Requête invalide (CSRF)."
+flash.teamup.imported: "%count% absence(s) importée(s)."
+flash.teamup.no_url: "Aucun lien calendrier TeamUp configuré."
+flash.teamup.no_url_hint: "Contacte l'administrateur."
+flash.teamup.configure_link: "Configurer maintenant →"
+flash.teamup.error: "Erreur lors de l'import."
+flash.teamup.error.fetch: "L'URL TeamUp n'a pas pu être récupérée. Vérifiez l'URL et la connexion réseau."
+
+# Confirmations
+confirm.delete: "Vraiment supprimer ?"
+
+# Listes vides
+msg.no.assemblies: "Aucune assemblée trouvée."
+msg.no.departments: "Aucun département trouvé."
+msg.no.persons: "Aucune personne trouvée."
+msg.no.tasks: "Aucune tâche trouvée."
+msg.no.absences: "Aucune absence trouvée."
+msg.no.external_tasks: "Aucune autre tâche trouvée."
+msg.no.special_dates: "Aucune date spéciale trouvée."
+msg.no.users: "Aucun utilisateur trouvé."
+
+# Dates spéciales
+special_date.type.memorial: "Le Mémorial"
+special_date.type.congress: "Congrès"
+special_date.type.service_week: "Semaine de service"
+special_date.type.misc: "Autre"
+
+# Planification
+planning.no_days: "Aucun jour de planification configuré pour ce mois."
+planning.free: "– libre –"
+planning.no_assembly: "Aucun accès à une assemblée configuré."
+planning.label.memorial: "Le Mémorial"
+planning.label.congress: "Congrès"
+planning.label.service_week: "Semaine de service"
+planning.label.misc: "Autre"
+
+# Calendrier / Modal absence
+calendar.no_person: "Aucun profil de personne lié – lecture seule."
+calendar.modal.new: "Nouvelle absence"
+calendar.modal.edit: "Modifier l'absence"
+calendar.confirm.delete: "Vraiment supprimer l'absence ?"
+calendar.error.save: "Erreur lors de l'enregistrement."
+
+# Noms des mois
+month.1: Janvier
+month.2: "Février"
+month.3: Mars
+month.4: Avril
+month.5: Mai
+month.6: Juin
+month.7: Juillet
+month.8: "Août"
+month.9: Septembre
+month.10: Octobre
+month.11: Novembre
+month.12: "Décembre"
+
+# Abréviations des jours
+day.Mon: Lun
+day.Tue: Mar
+day.Wed: Mer
+day.Thu: Jeu
+day.Fri: Ven
+day.Sat: Sam
+day.Sun: Dim
+
+# Export
+export.select_month: "Choisir le mois"
+export.download: "Téléchargement"
+export.format.word: "Word (.docx)"
+
+# Login
+login.subtitle: "Veuillez vous connecter"
+login.error: Erreur
+
+# Admin
+admin.assembly.switch: "Assemblée"
+admin.assembly.reset: "Retour à sa propre assemblée"
+
+# Tableau de bord
+dashboard.persons: Personnes
+dashboard.assemblies: "Assemblées"
+dashboard.quick_access: "Accès rapide"
+dashboard.to_planning: "Vers la planification"
+dashboard.to_calendar: "Vers le calendrier"
+dashboard.manage_absences: "Gérer les absences"
+dashboard.no_assembly: "Aucun accès à une assemblée configuré."
+dashboard.admin_no_assembly_title: "Aucune assemblée assignée."
+dashboard.admin_no_assembly_hint: "Veuillez créer une assemblée et l'attribuer à votre compte utilisateur."
+dashboard.current_plan: "Planning actuel"
+
+# Recherche & Aperçus
+search.persons.title: "Recherche de personnes"
+search.tasks.title: "Recherche de tâches"
+search.availability.title: "Recherche de disponibilité"
+search.persons.label: Nom
+search.persons.placeholder: "Saisir le prénom ou le nom"
+search.tasks.label: "Nom de la tâche"
+search.tasks.placeholder: "Saisir le nom de la tâche"
+search.no_results: "Aucun résultat trouvé."
+search.all: Tous
+search.optional: facultatif
+search.results_count: entrées
+search.tab.persons: Personnes
+search.tab.tasks: "Tâches"
+search.tab.availability: "Disponibilité"
+search.tab.overview: "Aperçus"
+search.overview.task_persons: "Tâches → Personnes"
+search.overview.person_tasks: "Personnes → Tâches"
+search.overview.history: "Historique de planification"
+search.overview.absences: "Aperçu des absences"
+search.overview.task_stats: "Statistiques des tâches"
+search.tab.fairness: "Équité & Rotation"
+search.fairness.title: "Équité & Rotation"
+search.fairness.person: Personne
+search.fairness.total: Total
+search.fairness.avg: "Ø Moyenne"
+search.fairness.over: "Surchargé (>+20%)"
+search.fairness.under: "Sous-chargé (<-20%)"
+search.fairness.ok: "Dans la norme (±20%)"
+search.person.master_data: "Données de base"
+search.person.task_freq: "Fréquence par tâche"
+search.person.history: "Historique de planification"
+search.person.count: Nombre
+search.task.eligible: "Personnes éligibles"
+search.task.no_eligible: "Aucune personne assignée."
+search.task.last_assignment: "Dernière affectation"
+search.task.never_assigned: "Jamais affecté"
+search.availability.result: "Personnes disponibles le"
+search.availability.none: "Aucune personne disponible trouvée."
+
+# Authentification à deux facteurs
+2fa.title: "Authentification à deux facteurs"
+2fa.instructions: "Veuillez saisir le code de votre application d'authentification."
+2fa.code_label: "Code d'authentification"
+2fa.submit: "Confirmer"
+2fa.status_title: "Statut"
+2fa.status.enabled: "2FA active"
+2fa.status.disabled: "2FA inactive"
+2fa.required_by_admin: "Obligatoire par l'admin"
+2fa.setup_title: "Configuration"
+2fa.setup_instructions: "Scannez le QR code avec votre application d'authentification (ex. Google Authenticator, Aegis)."
+2fa.setup_manual_code: "Ou saisissez ce code manuellement :"
+2fa.setup_confirm_instructions: "Saisissez ensuite le code à 6 chiffres généré pour terminer la configuration."
+2fa.disable_title: "Désactiver la 2FA"
+2fa.btn.setup: "Configurer la 2FA"
+2fa.btn.confirm: "Confirmer et activer"
+2fa.btn.disable: "Désactiver la 2FA"
+2fa.btn.regenerate_backup_codes: "Générer de nouveaux codes de secours"
+2fa.backup_codes.new_title: "Codes de secours"
+2fa.backup_codes.save_hint: "Conservez ces codes en sécurité. Chaque code ne peut être utilisé qu'une seule fois."
+2fa.backup_codes.count: "%count% code(s) de secours restant(s)."
+2fa.backup_codes.regenerate_title: "Régénérer les codes de secours"
+
+# Sélecteur de langue
+lang.de: "🇩🇪 DE"
+lang.en: "🇬🇧 EN"
+lang.fr: "🇫🇷 FR"
+
+# Réinitialisation du mot de passe
+title.password_reset: "Mot de passe oublié"
+title.change_password: "Changer le mot de passe"
+login.forgot_password: "Mot de passe oublié ?"
+password_reset.hint: "Entrez votre adresse e-mail pour recevoir un mot de passe à usage unique."
+password_reset.sent_title: "E-mail envoyé"
+password_reset.sent_hint: "Si l'adresse e-mail est connue, un mot de passe à usage unique a été envoyé. Vérifiez votre boîte mail."
+change_password.hint: "Veuillez entrer un nouveau mot de passe (au moins 8 caractères)."
+modal.force_password.title: "Définir le mot de passe"
+modal.force_password.intro: "Votre compte nécessite un nouveau mot de passe. Veuillez en définir un maintenant avant de pouvoir continuer."
+btn.send_reset: "Demander un mot de passe unique"
+btn.back_to_login: "Retour à la connexion"
+btn.save_password: "Enregistrer le mot de passe"
+label.new_password: "Nouveau mot de passe"
+label.password_confirm: "Confirmer le mot de passe"
+flash.password.changed: "Mot de passe modifié avec succès."
+flash.password.too_short: "Le mot de passe doit comporter au moins 8 caractères."
+flash.password.mismatch: "Les mots de passe ne correspondent pas."
+
+# Méthodes 2FA
+2fa.method_title: "Méthode 2FA"
+2fa.method.none: "Désactivée"
+2fa.method.totp: "Application d'authentification (TOTP)"
+2fa.method.email: "Code par e-mail"
+flash.2fa.method_saved: "Méthode 2FA enregistrée."
+2fa.policy.disabled_hint: "La 2FA est désactivée pour cette assemblée."
+
+# Politique 2FA de l'assemblée
+assembly.2fa_policy: "Paramètre 2FA"
+assembly.2fa_policy.disabled: "Désactivée"
+assembly.2fa_policy.user_choice: "Choix de l'utilisateur"
+assembly.2fa_policy.totp: "Application (TOTP)"
+assembly.2fa_policy.email: "Code par e-mail"
+assembly.weekdays.invalid: "Exactement un jour de semaine (lun.–ven.) et un jour de week-end (sam. ou dim.) doivent être sélectionnés."
+
+# Lien calendrier personnel (token public)
+calendar_token.section_title: "Lien calendrier personnel"
+calendar_token.description: "Ce lien permet d'accéder à votre calendrier d'absences sans connexion. Gardez ce lien confidentiel."
+calendar_token.link_label: "Votre lien calendrier personnel"
+calendar_token.btn_generate: "Générer le lien"
+calendar_token.btn_reset: "Régénérer le lien"
+calendar_token.btn_revoke: "Désactiver le lien"
+calendar_token.btn_copy: "Copier"
+calendar_token.no_token: "Aucun lien calendrier actif."
+calendar_token.title: "Calendrier personnel"
+calendar_token.readonly_note: "Vos absences uniquement"
+calendar_token.absent: "Absent"
+calendar_token.absences: "Absences"
+calendar_token.no_absences: "Aucune absence enregistrée."
+calendar_token.hint: "Ce calendrier affiche vos absences, autres tâches et affectations planifiées."
+flash.calendar_token.generated: "Lien calendrier généré."
+flash.calendar_token.revoked: "Lien calendrier désactivé."
+flash.assembly_token.generated: "Lien calendrier de l'assemblée généré."
+flash.assembly_token.revoked: "Lien calendrier de l'assemblée désactivé."
+assembly_token.title: "Liens calendrier publics"
+assembly_token.absence.title: "Calendrier des absences"
+assembly_token.absence.description: "Affiche toutes les absences de l'assemblée sans connexion. Gardez ce lien confidentiel."
+assembly_token.calendar.title: "Calendrier complet"
+assembly_token.calendar.description: "Affiche tous les événements de l'assemblée sans connexion. Gardez ce lien confidentiel."
+assembly_token.no_token: "Aucun lien actif."
+assembly_token.btn_generate: "Générer le lien"
+assembly_token.btn_reset: "Régénérer le lien"
+assembly_token.btn_revoke: "Désactiver le lien"
+assembly_token.confirm_revoke: "Vraiment désactiver ? Le lien actuel deviendra invalide."
+assembly_token.no_absences: "Aucune absence pour la période sélectionnée."
+nav.assembly_tokens: "Liens calendrier"
+calendar_token.external_tasks: "Autres tâches"
+calendar_token.no_external_tasks: "Aucune autre tâche enregistrée."
+calendar_token.btn_add_external_task: "+ Ajouter une tâche"
+calendar_token.assignments: "Affectations planifiées"
+calendar_token.no_assignments: "Aucune affectation planifiée."
+calendar_token.ext_task_label: "Description"
+calendar_token.ext_task_date: "Date"
+calendar_token.special_dates: "Dates spéciales"
+calendar_token.no_special_dates: "Aucune date spéciale."
+
+# Profil utilisateur
+title.profile: "Mon profil"
+profile.section_title: "Mon profil"
+profile.name: "Nom (nom d'affichage)"
+profile.email: "Adresse e-mail"
+profile.password_section: "Changer le mot de passe"
+profile.current_password: "Mot de passe actuel"
+profile.email_taken: "Cette adresse e-mail est déjà utilisée."
+profile.current_password_wrong: "Le mot de passe actuel est incorrect."
+flash.profile.saved: "Profil enregistré."
+flash.profile.password_changed: "Mot de passe modifié."
+flash.profile.email_required: "L'adresse e-mail ne peut pas être vide."
+profile.danger_zone: "Zone dangereuse"
+profile.delete_account: "Supprimer le compte"
+profile.delete_account_hint: "Le compte sera définitivement supprimé. Les données de planification seront conservées."
+profile.delete_account_confirm: "Vraiment supprimer votre compte ? Cette action est irréversible."
+flash.account.deleted: "Votre compte a été supprimé."
+planning.suggest_btn: "Générer une proposition"
+planning.suggest_loading: "Calcul en cours..."
+planning.suggest_modal.title: "Générer une proposition"
+planning.suggest_modal.hint: "Confirme que les données suivantes sont complètes."
+planning.suggest_modal.check1: "Absences complètement saisies ?"
+planning.suggest_modal.check2: "Autres tâches complètement saisies ?"
+planning.suggest_modal.check3: "Dates spéciales (congrès, commémoration) saisies ?"
+planning.suggest_modal.confirm: "Appliquer la proposition"
+planning.suggest_proposals: "Propositions de planification"
+planning.suggest_accept: "Accepter"
+planning.suggest_skip: "Ignorer"
+planning.suggest_accept_all: "Tout accepter"
+planning.suggest_applied: "propositions appliquées."
+planning.suggest_empty: "Aucune proposition trouvée."
+planning.suggest_warnings: "créneaux non assignables"
+planning.saved: "Enregistré."
+planning.reset: "Réinitialisé."
+planning.force_modal.title: "Planifier quand même ?"
+planning.force_modal.body: "La personne est marquée absente ou autrement planifiée ce jour. Planifier quand même ?"
+planning.force_modal.confirm: "Planifier quand même"
+planning.notify_btn: "Envoyer les notifications"
+planning.notify_confirm: "Envoyer des notifications à toutes les personnes planifiées pour ce mois ?"
+planning.notify_sent: "Notifications envoyées"
+planning.notify_skipped: "Ignoré (pas de compte/e-mail)"
+planning.lock.editing: "En cours de modification par"
+planning.lock.conflict: "Ce département est en cours de modification par un autre planificateur."
+planning.lock.released: "Verrouillage libéré – actualisation de la page."
+btn.teamup_import: "Import TeamUp"
+btn.import_confirm: "Confirmer l'import"
+btn.print: "Imprimer"
+import.review_title: "Vérifier l'import"
+import.review_hint: "Veuillez vérifier et corriger si nécessaire. Seules les entrées cochées seront importées."
+import.no_events: "Aucun événement trouvé dans le calendrier."
+import.ics_summary: "Entrée calendrier"
+import.match_type: "Correspondance"
+import.match_exact: "Exacte"
+import.match_partial: "Partielle"
+import.match_none: "Non trouvé"
+import.no_person: "aucune personne"
+import.upload_title: "Importer un PDF"
+import.upload_hint: "Importer un fichier ICS (TeamUp)"
+import.pdf_upload_hint: "Sélectionnez un fichier PDF. Les lignes avec des dates et noms de personnes seront reconnues automatiquement."
+import.ics_file: "Fichier ICS"
+import.pdf_file: "Fichier PDF"
+import.parse_btn: "Importer"
+import.no_file: "Aucun fichier sélectionné."
+import.file_empty: "Le fichier est vide ou illisible."
+import.file_not_pdf: "Veuillez télécharger uniquement des fichiers PDF."
+
+# Pagination & Filtre
+pagination.label: Navigation de pages
+pagination.previous: "‹ Précédent"
+pagination.next: "Suivant ›"
+pagination.page_of: "Page %page% sur %pages%"
+filter.search_placeholder: "Rechercher..."
+filter.results_for: "%count% résultat(s) pour « %q% »"
+filter.all_months: "Tous les mois"
+filter.all_years: "Toutes les années"
+
+# Modèles d'e-mail
+label.mail_templates: "Modèles d'e-mail"
+label.mail_invitation: "Invitation"
+label.mail_invitation_subject: "Objet : Invitation"
+label.mail_invitation_body: "Contenu : Invitation"
+label.mail_password_reset: "Réinitialisation du mot de passe"
+label.mail_password_reset_subject: "Objet : Réinitialisation du mot de passe"
+label.mail_password_reset_body: "Contenu : Réinitialisation du mot de passe"
+label.mail_calendar_link: "Lien calendrier"
+label.mail_calendar_link_subject: "Objet : Lien calendrier"
+label.mail_calendar_link_body: "Contenu : Lien calendrier"
+label.placeholders_available: "Variables disponibles :"
+label.generate_password: "Générer un mot de passe"
+btn.generate: "Générer"

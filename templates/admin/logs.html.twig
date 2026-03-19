@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Logs{% endblock %}
+{% block page_title %}Logs{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        #log-output {
+            font-family: monospace;
+            font-size: 0.8em;
+            white-space: pre-wrap;
+            word-break: break-all;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 4px;
+            max-height: 75vh;
+            overflow-y: auto;
+        }
+        .log-line { display: block; padding: 1px 0; }
+        .log-error { background: rgba(220,38,38,0.25); color: #fca5a5; }
+        .log-warning { background: rgba(234,179,8,0.2); color: #fde68a; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Logs</h1>
+        <span class="text-muted small font-monospace">{{ logFile }}</span>
+    </div>
+
+    {% if lines is empty %}
+        <div class="alert alert-info">Keine Log-Einträge vorhanden ({{ logFile }}).</div>
+    {% else %}
+        <div class="mb-3">
+            <input type="text" id="log-search" class="form-control form-control-sm"
+                   placeholder="Filtern…" autocomplete="off" style="max-width:400px">
+        </div>
+        <div id="log-output">
+            {% for line in lines %}
+                {% set isError   = ('ERROR' in line) or ('CRITICAL' in line) or ('ALERT' in line) or ('EMERGENCY' in line) %}
+                {% set isWarning = not isError and ('WARNING' in line) %}
+                <span class="log-line{% if isError %} log-error{% elseif isWarning %} log-warning{% endif %}" data-line="{{ line|e }}">{{ line }}</span>
+            {% endfor %}
+        </div>
+        <div class="text-muted small mt-2">Letzte {{ lines|length }} Zeilen (neueste zuerst)</div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        const searchInput = document.getElementById('log-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const q = this.value.toLowerCase();
+                document.querySelectorAll('#log-output .log-line').forEach(function (el) {
+                    el.style.display = q === '' || el.dataset.line.toLowerCase().includes(q) ? '' : 'none';
+                });
+            });
+        }
+    </script>
+{% endblock %}
