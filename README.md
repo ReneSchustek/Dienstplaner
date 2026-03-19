@@ -2,18 +2,26 @@
 
 Webanwendung zur Dienstplanung für Versammlungen. Verwaltet Personen, Aufgaben, Abteilungen und Planungstage. Ersetzt eine Excel-Lösung.
 
-**Stack:** Symfony 7.4 · PHP 8.3 · MariaDB 10.11 · Bootstrap 5 · DDEV
+**Stack:** Symfony 7.4 · PHP 8.3 · MariaDB 10.11 · Bootstrap 5
 
 ---
+
+## Voraussetzungen
+
+- PHP 8.3 mit den Extensions `ctype`, `iconv`, `intl`, `mbstring`, `pdo_mysql`, `xml`, `zip`
+- MariaDB 10.11 (oder MySQL 8)
+- Composer
+- Webserver (nginx oder Apache) mit Document Root auf `public/`
 
 ## Setup
 
 ```bash
-ddev start
-ddev composer install
-ddev exec php bin/console doctrine:database:create
-ddev exec php bin/console doctrine:migrations:migrate
-ddev exec php bin/console app:user:create-admin
+composer install --no-dev --optimize-autoloader
+cp .env .env.local
+# .env.local anpassen (Datenbankverbindung, Mailer, App-Secret)
+php bin/console doctrine:database:create
+php bin/console doctrine:migrations:migrate
+php bin/console app:user:create-admin
 ```
 
 ---
@@ -30,8 +38,7 @@ MAILER_SENDER_EMAIL=noreply@example.com
 MAILER_SENDER_NAME=Dienstplaner
 ```
 
-Auf der DevBox (ddev) sendet Mailpit alle Mails ab — kein echter Versand.
-Mailpit-Oberfläche: `https://dienstplaner.ddev.site:8026`
+Für lokale Entwicklung kann `MAILER_DSN=null://null` gesetzt werden — Mails werden dann verworfen.
 
 ---
 
@@ -252,7 +259,35 @@ php bin/phpunit
 
 ## Deployment
 
-Siehe `DEPLOYMENT.md`.
+Der Webserver muss auf `public/` als Document Root zeigen. Die Datei `public/index.php` ist der Einstiegspunkt.
+
+Empfohlene nginx-Konfiguration:
+
+```nginx
+root /var/www/dienstplaner/public;
+index index.php;
+
+location / {
+    try_files $uri /index.php$is_args$args;
+}
+
+location ~ ^/index\.php(/|$) {
+    fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+    fastcgi_split_path_info ^(.+\.php)(/.*)$;
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+    fastcgi_param DOCUMENT_ROOT $realpath_root;
+    internal;
+}
+```
+
+Nach jedem Deployment:
+
+```bash
+composer install --no-dev --optimize-autoloader
+php bin/console doctrine:migrations:migrate --no-interaction
+php bin/console cache:clear
+```
 
 ---
 
