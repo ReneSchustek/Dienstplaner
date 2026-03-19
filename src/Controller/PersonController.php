@@ -350,11 +350,11 @@ class PersonController extends AbstractController
     /**
      * Normalisiert einen Personennamen für den Duplikatvergleich.
      *
-     * Sortiert die Namenstokens alphabetisch, damit "Schustek, René" und "René Schustek" gleich behandelt werden.
+     * Sortiert die Namenstokens alphabetisch, damit "Müller, Hans" und "Hans Müller" gleich behandelt werden.
      */
     private function normalizePersonName(string $name): string
     {
-        // "Schustek, René" → "rene schustek" === "René Schustek" normalized
+        // "Müller, Hans" → "hans muller" === "Hans Müller" normalized
         $name = str_replace(',', ' ', $name);
         if (function_exists('transliterator_transliterate')) {
             $name = (string) transliterator_transliterate('Any-Latin; Latin-ASCII; Lower()', $name);
