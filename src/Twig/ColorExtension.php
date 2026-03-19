@@ -8,10 +8,12 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 /**
- * Twig-Filter für Farbberechnungen.
+ * Twig-Filter für Farbberechnungen und Namensformatierung.
  *
  * contrast_color: Gibt '#000000' oder '#ffffff' zurück, je nachdem
  * welche Textfarbe auf dem angegebenen Hintergrund besser lesbar ist.
+ *
+ * first_name: Gibt den ersten Teil eines vollständigen Namens zurück.
  */
 class ColorExtension extends AbstractExtension
 {
@@ -19,7 +21,14 @@ class ColorExtension extends AbstractExtension
     {
         return [
             new TwigFilter('contrast_color', [$this, 'contrastColor']),
+            new TwigFilter('first_name', [$this, 'firstName']),
         ];
+    }
+
+    /** Gibt den Vornamen (ersten Namensteil) eines vollständigen Namens zurück. */
+    public function firstName(string $fullName): string
+    {
+        return explode(' ', trim($fullName), 2)[0];
     }
 
     public function contrastColor(string $hexColor): string

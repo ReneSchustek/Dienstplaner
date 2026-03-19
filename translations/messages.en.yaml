@@ -440,6 +440,8 @@ profile.delete_account_hint: "The account will be permanently deleted. Planning 
 profile.delete_account_confirm: "Really delete your account? This action cannot be undone."
 flash.account.deleted: "Your account has been deleted."
 planning.suggest_btn: "Generate Proposal"
+planning.suggest_block_btn: "Proposal (Block)"
+planning.person.absent: "absent"
 planning.suggest_loading: "Calculating..."
 planning.suggest_modal.title: "Generate Proposal"
 planning.suggest_modal.hint: "Please confirm that the following data is complete."

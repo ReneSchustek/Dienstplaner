@@ -204,24 +204,39 @@
                             {% set assignment = dayAssignments[task.id] is defined ? dayAssignments[task.id] : null %}
                             <td class="p-1 text-center">
                                 {% if is_granted('ROLE_PLANER') %}
+                                {% set personHasConflict = assignment and externalByDayPerson[day.id] is defined and externalByDayPerson[day.id][assignment.person.id] is defined %}
                                 <select class="form-select form-select-sm assignment-select"
                                         data-day-id="{{ day.id }}"
                                         data-task-id="{{ task.id }}"
                                         data-block="{{ block.dept.id }}"
+                                        data-saved-val="{{ assignment ? assignment.person.id : '0' }}"
                                         aria-label="{{ task.name }} – {{ day.date|date('d.m.Y') }}">
                                     <option value="0">{{ 'planning.free'|trans }}</option>
                                     {% for person in personsByTask[task.id]|default([]) %}
+                                    {% set dateStr = day.date|date('Y-m-d') %}
+                                    {% set isAbsent = absentByDate[dateStr] is defined and absentByDate[dateStr][person.id] is defined %}
+                                    {% set conflictLabel = externalByDayPerson[day.id] is defined and externalByDayPerson[day.id][person.id] is defined ? externalByDayPerson[day.id][person.id] : null %}
                                     <option value="{{ person.id }}"
                                         data-person-id="{{ person.id }}"
+                                        data-name="{{ person.name }}"
+                                        {% if isAbsent %}data-absent="1"{% endif %}
+                                        {% if conflictLabel %}data-conflict="{{ conflictLabel|e('html_attr') }}"{% endif %}
                                         {% if assignment and assignment.person.id == person.id %}selected{% endif %}>
                                         {{ person.name }}
                                     </option>
                                     {% endfor %}
                                 </select>
-                                <span class="assignment-label">{% if assignment %}{{ assignment.person.name }}{% endif %}</span>
+                                <span class="assignment-label{% if personHasConflict %} text-warning fw-semibold{% endif %}"
+                                      {% if personHasConflict %}title="{{ externalByDayPerson[day.id][assignment.person.id] }}"{% endif %}>
+                                    {%- if assignment %}{{ assignment.person.name }}{% endif -%}
+                                </span>
                                 {% else %}
                                     {% if assignment %}
-                                        <span class="badge bg-success">{{ assignment.person.name }}</span>
+                                        {% set roConflict = externalByDayPerson[day.id] is defined and externalByDayPerson[day.id][assignment.person.id] is defined %}
+                                        <span class="badge bg-success{% if roConflict %} border border-warning{% endif %}"
+                                              {% if roConflict %}title="{{ externalByDayPerson[day.id][assignment.person.id] }}"{% endif %}>
+                                            {{ assignment.person.name }}
+                                        </span>
                                     {% else %}
                                         <span class="text-muted">–</span>
                                     {% endif %}
@@ -238,6 +253,13 @@
     </div>
     {% if is_granted('ROLE_PLANER') %}
     <div class="text-end mb-2 no-print d-flex gap-2 justify-content-end">
+        {% if is_granted('ROLE_ASSEMBLY_ADMIN') %}
+        <button type="button" class="btn btn-sm btn-outline-primary btn-suggest-block"
+                data-block="{{ block.dept.id }}"
+                data-suggest-block-url="{{ path('planning_suggest_block', {year: year, month: month, departmentId: block.dept.id}) }}">
+            {{ 'planning.suggest_block_btn'|trans }}
+        </button>
+        {% endif %}
         <button type="button" class="btn btn-sm btn-outline-secondary btn-reset-block"
                 data-block="{{ block.dept.id }}"
                 title="{{ 'btn.reset_hint'|trans }}">{{ 'btn.reset'|trans }}</button>
@@ -274,7 +296,7 @@
         return map;
     }
 
-    /** Aktualisiert alle Selects anhand der tagesaktuellen Belegung. */
+    /** Aktualisiert alle Selects anhand der tagesaktuellen Belegung; abwesende Personen bleiben immer deaktiviert. */
     function refreshAllSelects() {
         var dayPersonMap = buildDayPersonMap(null);
         document.querySelectorAll('.assignment-select').forEach(function (sel) {
@@ -283,7 +305,11 @@
             var currentVal = sel.value;
             sel.querySelectorAll('option[data-person-id]').forEach(function (opt) {
                 var pid = opt.dataset.personId;
-                opt.disabled = taken.has(pid) && pid !== currentVal;
+                if (opt.dataset.absent === '1') {
+                    opt.disabled = true;
+                } else {
+                    opt.disabled = taken.has(pid) && pid !== currentVal;
+                }
             });
         });
     }
@@ -297,12 +323,12 @@
         bootstrap.Toast.getOrCreateInstance(toastEl).show();
     }
 
-    /** Updates the print label next to a select. */
+    /** Updates the print label next to a select. Uses data-name to get the clean person name. */
     function updateAssignmentLabel(sel) {
         var label = sel.nextElementSibling;
         if (!label || !label.classList.contains('assignment-label')) return;
         var opt = sel.options[sel.selectedIndex];
-        label.textContent = sel.value === '0' ? '' : (opt ? opt.textContent.trim() : '');
+        label.textContent = sel.value === '0' ? '' : (opt ? (opt.dataset.name || opt.textContent.trim()) : '');
     }
 
     /** Sends an assign request; on canForce error opens the force modal. */
@@ -330,6 +356,7 @@
                     location.reload();
                 }
             } else {
+                sel.dataset.savedVal = sel.value;
                 updateAssignmentLabel(sel);
                 showToast('{{ 'planning.saved'|trans }}');
             }
@@ -363,6 +390,19 @@
             if (_forceModal) _forceModal.hide();
             if (_forcePendingSel) {
                 saveAssignment(_forcePendingSel, true);
+                _forcePendingSel = null;
+            }
+        });
+    }
+
+    // Slot auf frei zurücksetzen wenn Force-Modal abgebrochen wird (X oder Abbrechen).
+    var forceModalEl = document.getElementById('forceAssignModal');
+    if (forceModalEl) {
+        forceModalEl.addEventListener('hidden.bs.modal', function () {
+            if (_forcePendingSel) {
+                _forcePendingSel.value = _forcePendingSel.dataset.savedVal || '0';
+                updateAssignmentLabel(_forcePendingSel);
+                refreshAllSelects();
                 _forcePendingSel = null;
             }
         });
@@ -476,8 +516,20 @@
     window._planningUpdateLabel      = updateAssignmentLabel;
     window._planningDoSave           = saveAssignment;
 
-    // Initialer Durchlauf: bereits belegte Personen deaktivieren
+    // Initialer Durchlauf: bereits belegte Personen deaktivieren und Konflikte markieren
     refreshAllSelects();
+
+    // Abwesende und extern belegte Personen in den Dropdowns optisch kennzeichnen
+    document.querySelectorAll('.assignment-select option[data-person-id]').forEach(function (opt) {
+        var absentLabel = '{{ 'planning.person.absent'|trans }}';
+        if (opt.dataset.absent === '1') {
+            opt.textContent = (opt.dataset.name || opt.textContent.trim()) + ' (' + absentLabel + ')';
+            opt.disabled = true;
+        } else if (opt.dataset.conflict) {
+            opt.textContent = (opt.dataset.name || opt.textContent.trim()) + ' ⚠';
+            opt.title = opt.dataset.conflict;
+        }
+    });
 })();
 </script>
 
@@ -709,6 +761,35 @@
                 }
             });
     }
+
+    // Per-Block-Suggest: füllt nur freie Slots des jeweiligen Blocks
+    document.querySelectorAll('.btn-suggest-block').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var self    = this;
+            var url     = self.dataset.suggestBlockUrl;
+            var origTxt = self.textContent.trim();
+            if (!url) return;
+
+            self.disabled = true;
+            self.textContent = '{{ 'planning.suggest_loading'|trans }}';
+
+            fetch(url, { method: 'POST' })
+                .then(function (r) {
+                    if (!r.ok) { throw new Error('http:' + r.status); }
+                    return r.json();
+                })
+                .then(function (data) {
+                    applyProposals(data.proposals || [], data.warnings || []);
+                })
+                .catch(function () {
+                    alert('{{ 'calendar.error.save'|trans }}');
+                })
+                .finally(function () {
+                    self.disabled = false;
+                    self.textContent = origTxt;
+                });
+        });
+    });
 
     function applyProposals(proposals, warnings) {
         var applied = 0;

@@ -130,6 +130,17 @@ Der `PlanningRuleService` wendet Regeln auf den Tagesplan an:
 - Unter den verfügbaren Personen wird die mit dem niedrigsten Jahres-Fairness-Score gewählt
 - Der Planer kann jeden Vorschlag einzeln annehmen oder überspringen
 
+Zusätzlich gibt es je Abteilungsblock einen eigenen „Vorschlag (Block)"-Button (ab `ROLE_ASSEMBLY_ADMIN`). Dieser füllt nur freie Slots des jeweiligen Blocks und überschreibt keine bestehenden Zuteilungen.
+
+#### Konflikt-Erkennung im Dropdown
+
+Beim Zuweisen einer Person zeigt das Dropdown:
+- Personen mit externer Aufgabe am selben Tag mit einem ⚠-Symbol und Tooltip (Aufgabenbeschreibung)
+- Abwesende Personen als deaktivierte Optionen mit dem Zusatz `(abwesend)`
+- Bestehende Zuteilungen mit externer Aufgabe werden in der Planungsansicht hervorgehoben
+
+Wird eine Person trotz Konflikt ausgewählt (force-assign), erscheint ein Bestätigungsdialog. Abbrechen setzt den Slot auf „frei" zurück.
+
 #### Planungssperre
 
 Pro Zuteilung: `AssignmentService` prüft vor dem Speichern alle Konflikte serverseitig und wirft `DomainException` bei Verletzungen.
@@ -172,6 +183,15 @@ Jeder Benutzer kann unter `/profile/2fa` einen persönlichen Kalender-Link gener
 Zeigt: eigene Abwesenheiten, eigene externe Aufgaben, geplante Einsätze (readonly), besondere Daten. Navigation monatsweise. Abwesenheiten und externe Aufgaben können direkt eingetragen und gelöscht werden.
 
 Der Token (`calendar_token VARCHAR(64) UNIQUE`) wird per `bin2hex(random_bytes(32))` generiert.
+
+### Öffentlicher Kalender (Versammlungs-Token)
+
+Pro Versammlung gibt es zwei öffentliche Kalenderseiten (kein Login erforderlich):
+
+- `/c/{token}/absences` – Abwesenheitsübersicht (Tabelle, monatsweise)
+- `/c/{token}/calendar` – Kalenderansicht mit Abwesenheiten, Zuteilungen und externen Aufgaben
+
+In beiden Ansichten werden nur Vornamen angezeigt (Twig-Filter `first_name`). Vollständige Namen erscheinen ausschließlich in der internen Planungsansicht und im Adminbereich.
 
 ### ICS-Import (Abwesenheiten)
 

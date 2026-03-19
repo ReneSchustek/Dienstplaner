@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\AbsenceRepository;
 use App\Repository\AssignmentRepository;
 use App\Repository\DayRepository;
 use App\Repository\PersonRepository;
@@ -44,6 +45,7 @@ class PlanningController extends AbstractController
         private readonly DepartmentRepository $departmentRepository,
         private readonly AssemblyContext $assemblyContext,
         private readonly AssignmentRepository $assignmentRepository,
+        private readonly AbsenceRepository $absenceRepository,
         private readonly UserRepository $userRepository,
         private readonly MailerInterface $mailer,
         private readonly IcsGeneratorService $icsGenerator,
@@ -74,14 +76,19 @@ class PlanningController extends AbstractController
         $personsByTask = $this->buildPersonsByTask($assembly->getId(), $tasks);
         $departmentBlocks = $this->planningService->buildDepartmentBlocks($tasks);
 
+        $externalByDayPerson = $this->buildExternalConflictMap($grid);
+        $absentByDate        = $this->buildAbsentByDateMap($assembly->getId(), $year, $month);
+
         return $this->render('planning/index.html.twig', [
-            'grid' => $grid,
-            'tasks' => $tasks,
-            'departmentBlocks' => $departmentBlocks,
-            'personsByTask' => $personsByTask,
-            'assembly' => $assembly,
-            'year' => $year,
-            'month' => $month,
+            'grid'               => $grid,
+            'tasks'              => $tasks,
+            'departmentBlocks'   => $departmentBlocks,
+            'personsByTask'      => $personsByTask,
+            'assembly'           => $assembly,
+            'year'               => $year,
+            'month'              => $month,
+            'externalByDayPerson' => $externalByDayPerson,
+            'absentByDate'       => $absentByDate,
         ]);
     }
 
@@ -147,6 +154,37 @@ class PlanningController extends AbstractController
         $status = $this->lockService->getStatusForAssembly($assembly);
 
         return $this->json($status);
+    }
+
+    /** Externe Aufgaben als [dayId][personId] → Beschreibung Map. */
+    private function buildExternalConflictMap(array $grid): array
+    {
+        $map = [];
+        foreach ($grid as $dayId => $row) {
+            foreach ($row['externalTasks'] as $et) {
+                $map[$dayId][$et->getPerson()->getId()] = $et->getDescription() ?? 'Andere Aufgabe';
+            }
+        }
+        return $map;
+    }
+
+    /** Abwesenheiten als [dateStr][personId] → true Map für den gesamten Monat. */
+    private function buildAbsentByDateMap(int $assemblyId, int $year, int $month): array
+    {
+        $from     = new \DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month));
+        $to       = $from->modify('last day of this month');
+        $absences = $this->absenceRepository->findByAssemblyAndPeriod($assemblyId, $from, $to);
+
+        $map = [];
+        foreach ($absences as $absence) {
+            $pid = $absence->getPerson()->getId();
+            $d   = $absence->getStartDate();
+            while ($d <= $absence->getEndDate()) {
+                $map[$d->format('Y-m-d')][$pid] = true;
+                $d = $d->modify('+1 day');
+            }
+        }
+        return $map;
     }
 
     private function filterTasksForUser(User $user, array $allTasks): array
@@ -276,6 +314,37 @@ class PlanningController extends AbstractController
         $tasks    = $this->filterTasksForUser($user, $allTasks);
 
         $result = $this->proposalService->generateProposals($assembly, $year, $month, $grid, $tasks);
+
+        return $this->json($result);
+    }
+
+    #[Route('/suggest/{year}/{month}/block/{departmentId}', name: 'planning_suggest_block', methods: ['POST'])]
+    #[IsGranted('ROLE_ASSEMBLY_ADMIN')]
+    public function suggestBlock(int $year, int $month, int $departmentId): Response
+    {
+        /** @var User $user */
+        $user     = $this->getUser();
+        $assembly = $this->assemblyContext->getActiveAssembly($user);
+
+        if ($assembly === null) {
+            return $this->json(['error' => 'No assembly'], 400);
+        }
+
+        $department = $this->departmentRepository->find($departmentId);
+        if ($department === null) {
+            return $this->json(['error' => 'Department not found'], 404);
+        }
+
+        $grid     = $this->planningService->getPlanningGridForMonth($assembly, $year, $month);
+        $allTasks = $this->taskRepository->findByAssembly($assembly->getId());
+        $tasks    = $this->filterTasksForUser($user, $allTasks);
+
+        $blockTasks = array_values(array_filter(
+            $tasks,
+            fn ($t) => $t->getDepartment()->getId() === $departmentId
+        ));
+
+        $result = $this->proposalService->generateProposals($assembly, $year, $month, $grid, $blockTasks);
 
         return $this->json($result);
     }
