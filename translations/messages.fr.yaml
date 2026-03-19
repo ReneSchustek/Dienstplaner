@@ -440,6 +440,8 @@ profile.delete_account_hint: "Le compte sera définitivement supprimé. Les donn
 profile.delete_account_confirm: "Vraiment supprimer votre compte ? Cette action est irréversible."
 flash.account.deleted: "Votre compte a été supprimé."
 planning.suggest_btn: "Générer une proposition"
+planning.suggest_block_btn: "Proposition (bloc)"
+planning.person.absent: "absent"
 planning.suggest_loading: "Calcul en cours..."
 planning.suggest_modal.title: "Générer une proposition"
 planning.suggest_modal.hint: "Confirme que les données suivantes sont complètes."

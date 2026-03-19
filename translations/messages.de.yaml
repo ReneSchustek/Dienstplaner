@@ -440,6 +440,8 @@ profile.delete_account_hint: "Das Konto wird unwiderruflich gelöscht. Planungsd
 profile.delete_account_confirm: "Konto wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
 flash.account.deleted: "Dein Konto wurde gelöscht."
 planning.suggest_btn: "Vorschlag generieren"
+planning.suggest_block_btn: "Vorschlag (Block)"
+planning.person.absent: "abwesend"
 planning.suggest_loading: "Berechne..."
 planning.suggest_modal.title: "Vorschlag generieren"
 planning.suggest_modal.hint: "Bitte bestätige, dass die folgenden Daten vollständig eingetragen sind."

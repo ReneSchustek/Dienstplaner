@@ -78,13 +78,13 @@
             <div class="calendar-day {{ isToday ? 'today' : '' }} {{ (dayAbsences|length > 0 or dayAssignments|length > 0 or dayExtTasks|length > 0) ? 'has-event' : '' }}">
                 <div class="fw-semibold">{{ d }}</div>
                 {% for abs in dayAbsences %}
-                    <span class="badge-absence" title="{{ abs.person.name }}">{{ abs.person.name }}</span>
+                    <span class="badge-absence" title="{{ abs.person.name|first_name }}">{{ abs.person.name|first_name }}</span>
                 {% endfor %}
                 {% for asgn in dayAssignments %}
-                    <span class="badge-assignment" title="{{ asgn.person.name }} – {{ asgn.task.name }}">{{ asgn.person.name }}</span>
+                    <span class="badge-assignment" title="{{ asgn.person.name|first_name }} – {{ asgn.task.name }}">{{ asgn.person.name|first_name }}</span>
                 {% endfor %}
                 {% for et in dayExtTasks %}
-                    <span class="badge-ext-task" title="{{ et.person.name }}{{ et.description ? ': ' ~ et.description : '' }}">{{ et.person.name }}</span>
+                    <span class="badge-ext-task" title="{{ et.person.name|first_name }}{{ et.description ? ': ' ~ et.description : '' }}">{{ et.person.name|first_name }}</span>
                 {% endfor %}
             </div>
         {% endfor %}

@@ -43,7 +43,7 @@
             <tbody>
                 {% for absence in absences %}
                 <tr>
-                    <td>{{ absence.person.name }}</td>
+                    <td>{{ absence.person.name|first_name }}</td>
                     <td>{{ absence.startDate|date('d.m.Y') }}</td>
                     <td>{{ absence.endDate|date('d.m.Y') }}</td>
                     <td class="text-muted small">{{ absence.note ?? '' }}</td>
