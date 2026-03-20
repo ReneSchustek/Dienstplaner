@@ -204,7 +204,9 @@
                             {% set assignment = dayAssignments[task.id] is defined ? dayAssignments[task.id] : null %}
                             <td class="p-1 text-center">
                                 {% if is_granted('ROLE_PLANER') %}
+                                {% set dateStrCell = day.date|date('Y-m-d') %}
                                 {% set personHasConflict = assignment and externalByDayPerson[day.id] is defined and externalByDayPerson[day.id][assignment.person.id] is defined %}
+                                {% set personIsAbsent = assignment and absentByDate[dateStrCell] is defined and absentByDate[dateStrCell][assignment.person.id] is defined %}
                                 <select class="form-select form-select-sm assignment-select"
                                         data-day-id="{{ day.id }}"
                                         data-task-id="{{ task.id }}"
@@ -226,16 +228,24 @@
                                     </option>
                                     {% endfor %}
                                 </select>
-                                <span class="assignment-label{% if personHasConflict %} text-warning fw-semibold{% endif %}"
-                                      {% if personHasConflict %}title="{{ externalByDayPerson[day.id][assignment.person.id] }}"{% endif %}>
-                                    {%- if assignment %}{{ assignment.person.name }}{% endif -%}
+                                <span class="assignment-label">
+                                    {%- if assignment %}{{ assignment.person.name }}
+                                        {%- if personIsAbsent %} <span style="color:#dc3545" title="{{ 'planning.person.absent'|trans }}">&#9888;</span>
+                                        {%- elseif personHasConflict %} <span style="color:#ffc107" title="{{ externalByDayPerson[day.id][assignment.person.id] }}">&#9888;</span>
+                                        {%- endif %}
+                                    {%- endif -%}
                                 </span>
                                 {% else %}
                                     {% if assignment %}
                                         {% set roConflict = externalByDayPerson[day.id] is defined and externalByDayPerson[day.id][assignment.person.id] is defined %}
-                                        <span class="badge bg-success{% if roConflict %} border border-warning{% endif %}"
-                                              {% if roConflict %}title="{{ externalByDayPerson[day.id][assignment.person.id] }}"{% endif %}>
+                                        {% set roAbsent = absentByDate[day.date|date('Y-m-d')] is defined and absentByDate[day.date|date('Y-m-d')][assignment.person.id] is defined %}
+                                        <span class="badge bg-success"
+                                              {% if roAbsent %}title="{{ 'planning.person.absent'|trans }}"
+                                              {% elseif roConflict %}title="{{ externalByDayPerson[day.id][assignment.person.id] }}"{% endif %}>
                                             {{ assignment.person.name }}
+                                            {%- if roAbsent %} <span style="color:#dc3545">&#9888;</span>
+                                            {%- elseif roConflict %} <span style="color:#ffc107">&#9888;</span>
+                                            {%- endif %}
                                         </span>
                                     {% else %}
                                         <span class="text-muted">–</span>
@@ -375,7 +385,7 @@
 
     function openForceModal(sel, errorMsg) {
         var msgEl = document.getElementById('force-assign-message');
-        if (msgEl) msgEl.textContent = errorMsg + ' {{ 'planning.force_modal.body'|trans }}';
+        if (msgEl) msgEl.textContent = errorMsg;
         _forcePendingSel = sel;
         if (!_forceModal) {
             var modalEl = document.getElementById('forceAssignModal');
