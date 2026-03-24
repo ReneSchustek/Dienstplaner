@@ -97,7 +97,8 @@ class UserService
         }
 
         $person = new Person();
-        $person->setName($user->getName() ?? $user->getEmail());
+        $person->setFirstName($user->getFirstName() ?? '');
+        $person->setLastName($user->getLastName() ?? $user->getEmail());
         $person->setAssembly($user->getAssembly());
         $person->setEmail($user->getEmail());
 
@@ -108,9 +109,14 @@ class UserService
     private function syncPersonName(User $user): void
     {
         $person = $user->getPerson();
-        if ($person === null || $user->getName() === null) {
+        if ($person === null) {
             return;
         }
-        $person->setName($user->getName());
+        if ($user->getFirstName() !== null) {
+            $person->setFirstName($user->getFirstName());
+        }
+        if ($user->getLastName() !== null) {
+            $person->setLastName($user->getLastName());
+        }
     }
 }

@@ -281,7 +281,8 @@ class PersonController extends AbstractController
 
         $newUser = new User();
         $newUser->setEmail($email);
-        $newUser->setName($person->getName());
+        $newUser->setFirstName($person->getFirstName());
+        $newUser->setLastName($person->getLastName());
         $newUser->setRole($role);
         $newUser->setAssembly($assembly);
         $newUser->setPerson($person);

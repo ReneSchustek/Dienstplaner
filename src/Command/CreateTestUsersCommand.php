@@ -54,9 +54,9 @@ class CreateTestUsersCommand extends Command
         $io->title('Testbenutzer erstellen für: ' . $assembly->getName());
 
         $testUsers = [
-            ['email' => 'test.user@example.com',           'name' => 'Test Benutzer',           'role' => 'ROLE_USER'],
-            ['email' => 'test.planer@example.com',          'name' => 'Test Planer',              'role' => 'ROLE_PLANER'],
-            ['email' => 'test.assembly-admin@example.com',  'name' => 'Test Versammlungsadmin',   'role' => 'ROLE_ASSEMBLY_ADMIN'],
+            ['email' => 'test.user@example.com',           'firstName' => 'Test', 'lastName' => 'Benutzer',        'role' => 'ROLE_USER'],
+            ['email' => 'test.planer@example.com',          'firstName' => 'Test', 'lastName' => 'Planer',           'role' => 'ROLE_PLANER'],
+            ['email' => 'test.assembly-admin@example.com',  'firstName' => 'Test', 'lastName' => 'Versammlungsadmin', 'role' => 'ROLE_ASSEMBLY_ADMIN'],
         ];
 
         $rows = [];
@@ -71,7 +71,8 @@ class CreateTestUsersCommand extends Command
 
             $user = new User();
             $user->setEmail($data['email']);
-            $user->setName($data['name']);
+            $user->setFirstName($data['firstName']);
+            $user->setLastName($data['lastName']);
             $user->setRole($data['role']);
             $user->setAssembly($assembly);
             $user->setPassword($this->passwordHasher->hashPassword($user, $password));
@@ -80,7 +81,7 @@ class CreateTestUsersCommand extends Command
             $this->entityManager->persist($user);
             $this->entityManager->flush();
 
-            $rows[] = [$data['email'], $data['name'], $data['role'], $password];
+            $rows[] = [$data['email'], $data['firstName'] . ' ' . $data['lastName'], $data['role'], $password];
         }
 
         if (!empty($rows)) {

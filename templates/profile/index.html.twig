@@ -16,7 +16,7 @@
                 {% if user.person %}
                 <div class="mb-3">
                     <label class="form-label text-muted" style="font-size: 0.8rem;">{{ 'label.person.calendar'|trans }}</label>
-                    <div class="form-control-plaintext">{{ user.person.name }}</div>
+                    <div class="form-control-plaintext">{{ user.person.fullName }}</div>
                 </div>
                 {% endif %}
 
@@ -24,14 +24,26 @@
                     <input type="hidden" name="_token" value="{{ csrf_token('profile-update') }}">
 
                     <div class="mb-3">
-                        <label for="profile_name" class="form-label">{{ 'profile.name'|trans }}</label>
+                        <label for="profile_first_name" class="form-label">{{ 'profile.first_name'|trans }}</label>
                         <input
                             type="text"
-                            id="profile_name"
-                            name="name"
+                            id="profile_first_name"
+                            name="first_name"
                             class="form-control"
-                            value="{{ user.name ?? '' }}"
-                            autocomplete="name"
+                            value="{{ user.firstName ?? '' }}"
+                            autocomplete="given-name"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="profile_last_name" class="form-label">{{ 'profile.last_name'|trans }}</label>
+                        <input
+                            type="text"
+                            id="profile_last_name"
+                            name="last_name"
+                            class="form-control"
+                            value="{{ user.lastName ?? '' }}"
+                            autocomplete="family-name"
                         >
                     </div>
 

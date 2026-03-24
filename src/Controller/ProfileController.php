@@ -53,8 +53,9 @@ class ProfileController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $name = trim($request->request->getString('name'));
-        $email = trim($request->request->getString('email'));
+        $firstName = trim($request->request->getString('first_name'));
+        $lastName  = trim($request->request->getString('last_name'));
+        $email     = trim($request->request->getString('email'));
 
         if ($email === '') {
             $this->addFlash('error', 'flash.profile.email_required');
@@ -67,7 +68,8 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile_index');
         }
 
-        $user->setName($name !== '' ? $name : null);
+        $user->setFirstName($firstName !== '' ? $firstName : null);
+        $user->setLastName($lastName !== '' ? $lastName : null);
         $user->setEmail($email);
         $this->entityManager->flush();
 

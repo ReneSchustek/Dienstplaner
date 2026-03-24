@@ -27,8 +27,11 @@ class Person
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private string $name;
+    #[ORM\Column(type: 'string', length: 100)]
+    private string $firstName;
+
+    #[ORM\Column(type: 'string', length: 100)]
+    private string $lastName;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $email = null;
@@ -79,15 +82,38 @@ class Person
         return $this->id;
     }
 
-    public function getName(): string
+    public function getFirstName(): string
     {
-        return $this->name;
+        return $this->firstName;
     }
 
-    public function setName(string $name): static
+    public function setFirstName(string $firstName): static
     {
-        $this->name = $name;
+        $this->firstName = $firstName;
         return $this;
+    }
+
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): static
+    {
+        $this->lastName = $lastName;
+        return $this;
+    }
+
+    // Sortierformat: "Nachname, Vorname" — für interne Listen und Import-Matching
+    public function getName(): string
+    {
+        return $this->lastName . ', ' . $this->firstName;
+    }
+
+    // Anzeigeformat: "Vorname Nachname" — für öffentliche Ausgaben
+    public function getFullName(): string
+    {
+        return trim($this->firstName . ' ' . $this->lastName);
     }
 
     public function getEmail(): ?string

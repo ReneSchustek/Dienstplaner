@@ -34,8 +34,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $name = null;
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private ?string $firstName = null;
+
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private ?string $lastName = null;
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $email;
@@ -120,20 +123,47 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TotpTwo
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getFirstName(): ?string
     {
-        return $this->name;
+        return $this->firstName;
     }
 
-    public function setName(?string $name): static
+    public function setFirstName(?string $firstName): static
     {
-        $this->name = $name;
+        $this->firstName = $firstName;
         return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(?string $lastName): static
+    {
+        $this->lastName = $lastName;
+        return $this;
+    }
+
+    // Sortierformat: "Nachname, Vorname" — für interne Listen
+    public function getName(): ?string
+    {
+        if ($this->firstName === null && $this->lastName === null) {
+            return null;
+        }
+        return trim(($this->lastName ?? '') . ', ' . ($this->firstName ?? ''), ', ');
+    }
+
+    // Anzeigeformat: "Vorname Nachname" — für öffentliche Ausgaben
+    public function getFullName(): ?string
+    {
+        $full = trim(($this->firstName ?? '') . ' ' . ($this->lastName ?? ''));
+        return $full !== '' ? $full : null;
     }
 
     public function getDisplayName(): string
     {
-        return $this->name ?? $this->email;
+        return $this->getFullName() ?? $this->email;
     }
 
     public function getEmail(): string
