@@ -1,38 +1,101 @@
-### Symfony ###
-/.env.local
-/.env.local.php
-/.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
-/var/
+# ============================================================
+# .gitignore – dienstplaner (Symfony 7)
+# ============================================================
+
+# ============================================================
+# KI-ASSISTENZ – NIEMALS IN GIT (absolut sauber halten!)
+# ============================================================
+.ai/
+ai/
+CLAUDE.md
+.claude/
+*.claude
+.cursorrules
+.copilot/
+.github/copilot-instructions.md
+briefs/
+STATUS.md
+TODO.md
+memory/
+brief-template.md
+
+# ============================================================
+# Interne Projektdokumente – nicht für öffentliche Repos
+# ============================================================
+DEPLOYMENT.md
+zugaenge.md
+docs/
+
+# ============================================================
+# Produktions-Umgebungsdateien (NIEMALS in Git!)
+# ============================================================
+.env.live
+.env.prod
+
+# ============================================================
+# Debug- / Info-Scripte (Sicherheitsrisiko)
+# ============================================================
+public/extract.php
+public/info.php
+git
+
+# ============================================================
+# Symfony Standard
+# ============================================================
 /vendor/
+/var/
+/public/bundles/
+/public/build/
 
-### Node ###
+# ============================================================
+# Symfony Secrets (NIEMALS in Git!)
+# ============================================================
+.env.local
+.env.local.php
+.env.*.local
+config/secrets/prod/prod.decrypt.private.php
+!.env
+!.env.test
+
+# ============================================================
+# Node / Assets
+# ============================================================
 /node_modules/
+npm-debug.log
+yarn-error.log
 
-### IDE ###
-/.idea/
-/.vscode/
-*.iml
+# ============================================================
+# PHP / Composer
+# ============================================================
+*.phar
+composer.lock
 
-### DDEV ###
-/.ddev/
+# ============================================================
+# Test-Ergebnisse
+# ============================================================
+.phpunit.result.cache
+/coverage/
 
-### AI Development ###
-/ai/
-/briefs/
-/docs/
-/memory/
-/.claude/
-/CLAUDE.md
-/STATUS.md
+# ============================================================
+# Datenbank (lokale Entwicklung)
+# ============================================================
+*.sqlite
+*.db
 
-### Local only ###
-/zugaenge.md
-/TODO.md
-/git
-/.env.live
-/public/extract.php
-/public/info.php
-/public/.htaccess
-/DEPLOYMENT.md
+# ============================================================
+# DDEV (lokale Entwicklungsumgebung, nicht ins Repo)
+# ============================================================
+.ddev/
+
+# ============================================================
+# IDE & Betriebssystem
+# ============================================================
+.idea/
+.vscode/
+*.DS_Store
+Thumbs.db
+
+# ============================================================
+# Logs
+# ============================================================
+*.log
