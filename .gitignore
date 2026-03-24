@@ -25,6 +25,9 @@ yarn-error.log
 .phpunit.result.cache
 /coverage/
 
+# Generierte Dateien
+/config/reference.php
+
 # DDEV
 .ddev/
 
