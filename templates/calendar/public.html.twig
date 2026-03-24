@@ -21,8 +21,11 @@
 </head>
 <body>
 
+{% if person %}
+    {% set personDisplayName = ', ' in person.name ? person.name|split(', ')|last : person.name %}
+{% endif %}
 {{ include('public/_header.html.twig', {
-    appName: 'calendar_token.title'|trans ~ (person ? ' – ' ~ person.name : ''),
+    appName: 'calendar_token.title'|trans ~ (person ? ' – ' ~ personDisplayName : ''),
     subtitle: user.assembly ? user.assembly.name : null
 }) }}
 
