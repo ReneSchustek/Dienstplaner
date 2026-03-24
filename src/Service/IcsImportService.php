@@ -70,7 +70,7 @@ class IcsImportService
             $absence->setPerson($person);
             $absence->setStartDate($startDate);
             $absence->setEndDate($endDate);
-            $absence->setNote('TeamUp: ' . $title);
+            $absence->setNote('Import');
 
             $this->entityManager->persist($absence);
             $imported++;

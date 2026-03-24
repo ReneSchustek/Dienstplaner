@@ -50,7 +50,7 @@ class TeamUpImportService
             $absence->setPerson($person);
             $absence->setStartDate($startDate);
             $absence->setEndDate($endDate);
-            $absence->setNote('TeamUp Import: ' . ($event['title'] ?? ''));
+            $absence->setNote('Import');
 
             $this->entityManager->persist($absence);
             $imported++;
