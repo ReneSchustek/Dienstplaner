@@ -25,10 +25,16 @@ class ColorExtension extends AbstractExtension
         ];
     }
 
-    /** Gibt den Vornamen (ersten Namensteil) eines vollständigen Namens zurück. */
+    /** Gibt den Vornamen zurück. Unterstützt "Nachname, Vorname" und "Vorname Nachname". */
     public function firstName(string $fullName): string
     {
-        return explode(' ', trim($fullName), 2)[0];
+        $trimmed = trim($fullName);
+
+        if (str_contains($trimmed, ', ')) {
+            return explode(', ', $trimmed, 2)[1];
+        }
+
+        return explode(' ', $trimmed, 2)[0];
     }
 
     public function contrastColor(string $hexColor): string
