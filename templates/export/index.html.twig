@@ -41,9 +41,9 @@
 {% block javascripts %}
 <script>
 (function() {
-    var pdfBase = '{{ path('export_pdf', {year: 'YEAR', month: 'MONTH'}) }}';
-    var excelBase = '{{ path('export_excel', {year: 'YEAR', month: 'MONTH'}) }}';
-    var wordBase = '{{ path('export_word', {year: 'YEAR', month: 'MONTH'}) }}';
+    var pdfBase = '{{ path('export_pdf', {year: 'YEAR', month: 'MONTH'})|raw }}';
+    var excelBase = '{{ path('export_excel', {year: 'YEAR', month: 'MONTH'})|raw }}';
+    var wordBase = '{{ path('export_word', {year: 'YEAR', month: 'MONTH'})|raw }}';
 
     function buildUrl(base) {
         var year = document.getElementById('year').value;
