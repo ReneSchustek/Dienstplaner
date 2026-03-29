@@ -34,7 +34,8 @@ class PersonRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('p')
             ->where('p.assembly = :assemblyId')
             ->setParameter('assemblyId', $assemblyId)
-            ->orderBy('p.name', 'ASC');
+            ->orderBy('p.lastName', 'ASC')
+            ->addOrderBy('p.firstName', 'ASC');
 
         if ($departmentIds !== null) {
             $qb->join('p.tasks', 'pt')
@@ -60,10 +61,11 @@ class PersonRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('p')
             ->where('p.assembly = :assemblyId')
-            ->andWhere('p.name LIKE :query')
+            ->andWhere('p.firstName LIKE :query OR p.lastName LIKE :query')
             ->setParameter('assemblyId', $assemblyId)
             ->setParameter('query', '%' . $query . '%')
-            ->orderBy('p.name', 'ASC');
+            ->orderBy('p.lastName', 'ASC')
+            ->addOrderBy('p.firstName', 'ASC');
 
         if ($departmentIds !== null) {
             $qb->join('p.tasks', 'pt')
@@ -97,7 +99,8 @@ class PersonRepository extends ServiceEntityRepository
             )')
             ->setParameter('assemblyId', $assemblyId)
             ->setParameter('date', $date)
-            ->orderBy('p.name', 'ASC');
+            ->orderBy('p.lastName', 'ASC')
+            ->addOrderBy('p.firstName', 'ASC');
 
         if ($taskId !== null) {
             $qb->join('p.tasks', 't')
@@ -181,11 +184,11 @@ class PersonRepository extends ServiceEntityRepository
         }
 
         if ($q !== '') {
-            $qb->andWhere('p.name LIKE :q')->setParameter('q', '%' . $q . '%');
+            $qb->andWhere('p.firstName LIKE :q OR p.lastName LIKE :q')->setParameter('q', '%' . $q . '%');
         }
 
-        $allowedSort = ['name' => 'p.name', 'email' => 'p.email'];
-        $sortField   = $allowedSort[$sort] ?? 'p.name';
+        $allowedSort = ['name' => 'p.lastName', 'email' => 'p.email'];
+        $sortField   = $allowedSort[$sort] ?? 'p.lastName';
         $sortDir     = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
         $qb->orderBy($sortField, $sortDir);
 
@@ -201,7 +204,8 @@ class PersonRepository extends ServiceEntityRepository
             ->join('p.tasks', 't')
             ->where('p.assembly = :assemblyId')
             ->andWhere('t.id = :taskId')
-            ->orderBy('p.name', 'ASC')
+            ->orderBy('p.lastName', 'ASC')
+            ->addOrderBy('p.firstName', 'ASC')
             ->setParameter('assemblyId', $assemblyId)
             ->setParameter('taskId', $taskId)
             ->getQuery()

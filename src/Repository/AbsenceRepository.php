@@ -121,7 +121,7 @@ class AbsenceRepository extends ServiceEntityRepository
         }
 
         if ($q !== '') {
-            $qb->andWhere('p.name LIKE :q')->setParameter('q', '%' . $q . '%');
+            $qb->andWhere('p.firstName LIKE :q OR p.lastName LIKE :q')->setParameter('q', '%' . $q . '%');
         }
 
         if ($year > 0) {
@@ -135,7 +135,7 @@ class AbsenceRepository extends ServiceEntityRepository
                ->andWhere('a.endDate >= :filterFrom')->setParameter('filterFrom', $from);
         }
 
-        $allowedSort = ['startDate' => 'a.startDate', 'endDate' => 'a.endDate', 'person' => 'p.name'];
+        $allowedSort = ['startDate' => 'a.startDate', 'endDate' => 'a.endDate', 'person' => 'p.lastName'];
         $sortField   = $allowedSort[$sort] ?? 'a.startDate';
         $sortDir     = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
         $qb->orderBy($sortField, $sortDir);

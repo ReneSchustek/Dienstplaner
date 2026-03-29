@@ -68,7 +68,7 @@ class ExternalTaskRepository extends ServiceEntityRepository
         }
 
         if ($q !== '') {
-            $qb->andWhere('p.name LIKE :q')->setParameter('q', '%' . $q . '%');
+            $qb->andWhere('p.firstName LIKE :q OR p.lastName LIKE :q')->setParameter('q', '%' . $q . '%');
         }
 
         if ($year > 0) {
@@ -82,7 +82,7 @@ class ExternalTaskRepository extends ServiceEntityRepository
                ->andWhere('d.date <= :filterTo')->setParameter('filterTo', $to);
         }
 
-        $allowedSort = ['date' => 'd.date', 'person' => 'p.name'];
+        $allowedSort = ['date' => 'd.date', 'person' => 'p.lastName'];
         $sortField   = $allowedSort[$sort] ?? 'd.date';
         $sortDir     = strtoupper($dir) === 'ASC' ? 'ASC' : 'DESC';
         $qb->orderBy($sortField, $sortDir);
